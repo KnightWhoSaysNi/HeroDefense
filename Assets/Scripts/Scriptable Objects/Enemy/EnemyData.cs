@@ -6,8 +6,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EnemyData", menuName = "Custom Enemy")]
 public class EnemyData : ScriptableObject
 {
-    public GameObject enemyPrefab;
-
     // ADD TO CONST
     [Range(0, 1000)] public float maxHealth;
     [Range(0, 1000)] public float currentHealth;

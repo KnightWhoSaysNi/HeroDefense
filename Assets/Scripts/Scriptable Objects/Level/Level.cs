@@ -6,5 +6,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Level", menuName = "Level")]
 public class Level : ScriptableObject
 {
-    public List<Wave> waves;    
+    /// <summary>
+    /// A list of waves along with additional level information, like the wave count.
+    /// </summary>
+    public List<LevelElement> levelElements;
 }

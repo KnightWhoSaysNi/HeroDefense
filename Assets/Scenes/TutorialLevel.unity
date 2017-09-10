@@ -311,6 +311,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a7fe0347e4a1c749bf3951991de9062, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  testLevel: {fileID: 11400000, guid: 3c5c4c0f2c459324493f486c97317ffb, type: 2}
   level: {fileID: 11400000, guid: fb5ffc4e10ab38846b32d864e590e1a0, type: 2}
   spawnPoint: {fileID: 1974786483}
   endPoint: {fileID: 1391929127}
@@ -626,7 +627,7 @@ Prefab:
     - target: {fileID: 2300002, guid: 0e806a5b02dd9e94ea6622c537710908, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 9063efe91b0b03e4a854faf5da77ee9c, type: 2}
+      objectReference: {fileID: 2100000, guid: d62f2b3b9bb4c9745a4c6a425dfdf208, type: 2}
     - target: {fileID: 2300004, guid: 0e806a5b02dd9e94ea6622c537710908, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -670,7 +671,7 @@ Prefab:
     - target: {fileID: 2300008, guid: 0e806a5b02dd9e94ea6622c537710908, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 9063efe91b0b03e4a854faf5da77ee9c, type: 2}
+      objectReference: {fileID: 2100000, guid: d62f2b3b9bb4c9745a4c6a425dfdf208, type: 2}
     - target: {fileID: 100010, guid: 0e806a5b02dd9e94ea6622c537710908, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 1

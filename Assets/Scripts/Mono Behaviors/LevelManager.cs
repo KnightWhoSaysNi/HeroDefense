@@ -18,7 +18,7 @@ public class LevelManager : MonoBehaviour
     private int numberOfEnemies;
     private bool shouldEnemiesAppear;
     private bool areAllEnemiesSpawned;
-    
+        
 
     private void Update()
     {
@@ -31,15 +31,15 @@ public class LevelManager : MonoBehaviour
 
     private IEnumerator PlayLevel()
     {
-        int numberOfWaves = level.waves.Count;
+        int numberOfWaves = level.levelElements.Count;
 
         // Go through each wave in the level
         for (int i = 0; i < numberOfWaves; i++)
         {
             // Wave start delay
-            yield return new WaitForSeconds(level.waves[i].startDelay);
+            yield return new WaitForSeconds(level.levelElements[i].wave.startDelay);
 
-            currentWave = level.waves[i];
+            currentWave = level.levelElements[i].wave;
             currentWaveIndex = i;
 
             // Go through current wave 
@@ -51,31 +51,31 @@ public class LevelManager : MonoBehaviour
             }
 
             // Wave end delay
-            yield return new WaitForSeconds(level.waves[i].endDelay);
+            yield return new WaitForSeconds(level.levelElements[i].wave.endDelay);
         }
     }
 
     // TODO Use System.Random and set a global random seed for saving/loading?
     private IEnumerator PlayWave()
     {
-        int numberOfDifferentEnemies = currentWave.enemies.Count;
+        int numberOfDifferentEnemies = currentWave.waveElements.Count;
         spawnCooldown = new WaitForSeconds(currentWave.spawnRate);
 
         // Go through each enemy type
         for (int i = 0; i < numberOfDifferentEnemies; i++)
         {
-            shouldEnemiesAppear = currentWave.enemies[i].chanceOfAppearing >= Random.Range(0f, 1f); // ADD TO CONST values in range 0 and 1
+            shouldEnemiesAppear = currentWave.waveElements[i].chanceOfAppearing >= Random.Range(0f, 1f); // ADD TO CONST values in range 0 and 1
 
             if (shouldEnemiesAppear)
             {
-                additionalSpawnDelay = new WaitForSeconds(currentWave.enemies[i].delayBeforeSpawning);                
+                additionalSpawnDelay = new WaitForSeconds(currentWave.waveElements[i].delayBeforeSpawning);                
 
                 // Get the exact number of enemies for this enemy type
-                numberOfEnemies = Random.Range(currentWave.enemies[i].minNumberOfEnemies, currentWave.enemies[i].maxNumberOfEnemies);
+                numberOfEnemies = Random.Range(currentWave.waveElements[i].minNumberOfEnemies, currentWave.waveElements[i].maxNumberOfEnemies);
 
                 for (int j = 0; j < numberOfEnemies; j++)
                 {
-                    SpawnEnemy(currentWave.enemies[i].enemyData);
+                    SpawnEnemy(currentWave.waveElements[i].enemy);
 
                     yield return additionalSpawnDelay;
                     yield return spawnCooldown;
@@ -90,14 +90,15 @@ public class LevelManager : MonoBehaviour
     /// <summary>
     /// Spawns individual enemy with the given enemy data.
     /// </summary>
-    /// <param name="enemyData">Information on the enemy to be spawned.</param>
-    private void SpawnEnemy(EnemyData enemyData)
+    /// <param name="enemy">Information on the enemy to be spawned.</param>
+    private void SpawnEnemy(Enemy enemy)
     {
         // TODO Create an enemy object pool 
-        GameObject enemy = Instantiate(enemyData.enemyPrefab, spawnPoint.position, spawnPoint.rotation, enemiesParent);
-        // TODO just a test
-        enemy.GetComponent<MoveAgent>().waypoints = new Transform[] { spawnPoint, endPoint };
-        numberOfAliveEnemies++;
+
+        //GameObject enemyObj = Instantiate(enemy.enemyPrefab, spawnPoint.position, spawnPoint.rotation, enemiesParent);
+        //// TODO just a test
+        //enemy.GetComponent<MoveAgent>().waypoints = new Transform[] { spawnPoint, endPoint };
+        //numberOfAliveEnemies++;
     }
 
     private bool IsWaveFinished()

@@ -232,7 +232,7 @@ public class LevelEditor : Editor
     #endregion 
 
     /// <summary>
-    /// Draws validation indicators in the given rect based on the specified validity.
+    /// Draws a validation indicator in the given rect based on the specified validity.
     /// </summary>
     /// <param name="rect">Rect where the indicators will be drawn.</param>
     /// <param name="isValid">Value for which indicator to use.</param>
@@ -250,15 +250,20 @@ public class LevelEditor : Editor
         }
     }
 
+    /// <summary>
+    /// Displays information about the validity of the level, i.e. if it can be used in play mode or not.
+    /// </summary>
     private void DrawLevelValidityInfo()
     {
         bool isLevelValid = EditorHelper.IsLevelValid(level);
 
         Rect rect = EditorGUILayout.BeginHorizontal();
 
+        // Validation circles
         Rect validationRect = new Rect(rect.x + 10, rect.y, 30, EditorGUIUtility.singleLineHeight);
         DrawValidationIndicators(validationRect, isLevelValid);
 
+        // Validation label
         Rect labelRect = new Rect(validationRect.xMax + 15, rect.y, rect.width - validationRect.xMax - 15, EditorGUIUtility.singleLineHeight);
         if (isLevelValid)
         {

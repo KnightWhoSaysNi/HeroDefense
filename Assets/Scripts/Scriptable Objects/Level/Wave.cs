@@ -15,19 +15,22 @@ public class Wave : ScriptableObject
     [Range(0, 100)] public float endDelay; // ADD TO CONST
 
     /// <summary>
-    /// A list of all enemy types and information about their number, chance of appearing and additional delay (e.g. for mini bosses).
-    /// </summary>
-    public List<WaveEnemyData> enemies;
-    /// <summary>
     /// False would spawn enemies as they are listed in the enemies field. True would randomize their order of appearance.
     /// </summary>
-    [Tooltip("Not implemented yet. Does nothing")] // TODO
+    [Space(5)]
+    [Tooltip("Not implemented yet. Does nothing.")]
     public bool shouldRandomizeEnemies;
     /// <summary>
-    /// Every specified second an individual enemy is spawned.
+    /// How fast enemies will spawn - every specified second.
     /// </summary>
-    [Tooltip("Every specified second an individual enemy is spawned")]
-    [Range(0,100)] public float spawnRate; // ADD TO CONST
+    [Tooltip("How fast enemies will spawn - every specified second.")]
+    [Range(0, 100)] public float spawnRate; // ADD TO CONST
+
+    [Space(10)]
+    /// <summary>
+    /// A list enemies along with additional wave information, like their min/max number and spawn delay.
+    /// </summary>
+    public List<WaveELement> waveElements;
 
     // TODO maybe set spawnRate for each type separately                     
     // TODO Create a reward for finishing a wave    
