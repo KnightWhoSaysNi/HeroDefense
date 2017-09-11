@@ -27,6 +27,13 @@ public static class EditorHelper
 
         for (int i = 0; i < level.levelElements.Count; i++)
         {
+
+            if (level.levelElements[i] == null)
+            {
+                // Level cannot have a null level element as it holds information about the wave that is supposed to be playing
+                return false;
+            }
+
             if (level.levelElements[i].waveCount < 1)
             {
                 // A wave count that is less than 1 makes no sense, the wave needs to play at least once

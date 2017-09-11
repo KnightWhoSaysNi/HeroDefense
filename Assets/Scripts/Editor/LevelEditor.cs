@@ -10,9 +10,9 @@ using UnityEngine;
 public class LevelEditor : Editor
 {
     #region - Fields -
-    private readonly string levelElementsPropertyName = "levelElements"; // ADD TO CONST ?
-    private readonly string wavePropertyName = "wave"; // ADD TO CONST ?
-    private readonly string waveCountPropertyName = "waveCount"; // ADD TO CONST ?
+    private readonly string levelElementsPropertyName = nameof(Level.levelElements);
+    private readonly string wavePropertyName = nameof(LevelElement.wave);
+    private readonly string waveCountPropertyName = nameof(LevelElement.waveCount);
 
     private Level level;
     private SerializedProperty levelElementsProperty;
