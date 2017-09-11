@@ -117,7 +117,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 473190264}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Environment
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,7 +150,7 @@ GameObject:
   - component: {fileID: 548806865}
   - component: {fileID: 548806864}
   - component: {fileID: 548806863}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Water
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -217,7 +217,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 548806862}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.05, z: 0}
+  m_LocalPosition: {x: 0, y: -0.05, z: -0.1}
   m_LocalScale: {x: 50, y: 1, z: 50}
   m_Children: []
   m_Father: {fileID: 473190264}
@@ -311,11 +311,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a7fe0347e4a1c749bf3951991de9062, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testLevel: {fileID: 11400000, guid: 3c5c4c0f2c459324493f486c97317ffb, type: 2}
   level: {fileID: 11400000, guid: fb5ffc4e10ab38846b32d864e590e1a0, type: 2}
   spawnPoint: {fileID: 1974786483}
   endPoint: {fileID: 1391929127}
-  enemiesParent: {fileID: 1292880424}
+  enemyParent: {fileID: 1292880424}
 --- !u!114 &755987994
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,7 +336,7 @@ GameObject:
   - component: {fileID: 912150094}
   - component: {fileID: 912150095}
   - component: {fileID: 912150096}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: WallColliderObstacle (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -473,7 +472,7 @@ GameObject:
   - component: {fileID: 1171768199}
   - component: {fileID: 1171768200}
   - component: {fileID: 1171768201}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: WallColliderObstacle (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -530,7 +529,7 @@ GameObject:
   - component: {fileID: 1172420515}
   - component: {fileID: 1172420516}
   - component: {fileID: 1172420517}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: WallColliderObstacle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -688,6 +687,26 @@ Prefab:
       propertyPath: m_ScaleInLightmap
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 100006, guid: 0e806a5b02dd9e94ea6622c537710908, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 100010, guid: 0e806a5b02dd9e94ea6622c537710908, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: 0e806a5b02dd9e94ea6622c537710908, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 100004, guid: 0e806a5b02dd9e94ea6622c537710908, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 0e806a5b02dd9e94ea6622c537710908, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0e806a5b02dd9e94ea6622c537710908, type: 3}
   m_IsPrefabParent: 0
@@ -790,7 +809,7 @@ GameObject:
   - component: {fileID: 1404464852}
   - component: {fileID: 1404464853}
   - component: {fileID: 1404464854}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: WallColliderObstacle (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -851,7 +870,7 @@ GameObject:
   - component: {fileID: 1557463548}
   - component: {fileID: 1557463549}
   - component: {fileID: 1557463550}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: WallColliderObstacle (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
