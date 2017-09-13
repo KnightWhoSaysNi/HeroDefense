@@ -21,7 +21,7 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
-       
+        
     }
 
     private void Update()
@@ -101,10 +101,10 @@ public class LevelManager : MonoBehaviour
     private void SpawnEnemy(Enemy enemy)
     {
         // TODO Create an enemy object pool 
-
-        enemy.GetComponent<MoveAgent>().waypoints = new Transform[] { spawnPoint, endPoint };
         GameObject enemyObj = Instantiate(enemy.gameObject, spawnPoint.position, spawnPoint.rotation, enemyParent);
-        // TODO just a test
+        Enemy instantiatedEnemy = enemyObj.GetComponent<Enemy>();
+        instantiatedEnemy.moveAgent.SetTarget(endPoint.position);
+        
         numberOfAliveEnemies++;
     }
 
