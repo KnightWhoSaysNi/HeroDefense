@@ -40,7 +40,10 @@ public class MoveAgent : MonoBehaviour
     {
         hasFollowTarget = true;
         this.followTargetTransform = followTargetTransform;
-        followTargetOffset = zeroVector;
+        this.followTargetOffset = zeroVector;
+
+        StopAllCoroutines();
+        StartCoroutine(FollowTarget());
     }
 
     /// <summary>
@@ -51,35 +54,18 @@ public class MoveAgent : MonoBehaviour
     /// <param name="followTargetOffset">Offset to the target transform's position.</param>
     public void FollowTarget(Transform followTargetTransform, Vector3 followTargetOffset)
     {
-        FollowTarget(followTargetTransform);
+        hasFollowTarget = true;
+        this.followTargetTransform = followTargetTransform;
         this.followTargetOffset = followTargetOffset;
+
+        StopAllCoroutines();
+        StartCoroutine(FollowTarget());
     }
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         zeroVector = Vector3.zero;
-    }
-
-    private void Update()
-    {
-        if (hasFollowTarget)
-        {
-            if (followTargetTransform != null)
-            {
-                if (!agent.pathPending && 
-                    (followTargetTransform.position + followTargetOffset) != agent.destination) // A check to see if the target object has moved                                               
-                {
-                    agent.SetDestination(followTargetTransform.position + followTargetOffset);
-                }
-            }
-            else
-            {
-                // Transform of the target object being null could mean that the target has been destroyed
-                // TODO Resolve such a scenario
-                hasFollowTarget = false;
-            }
-        }
     }
 
     /// <summary>
@@ -95,5 +81,28 @@ public class MoveAgent : MonoBehaviour
         // In case there was a follow target
         hasFollowTarget = false;
         agent.SetDestination(targetPosition);
+    }
+
+    private IEnumerator FollowTarget()
+    {
+        while (hasFollowTarget)
+        {
+            if (followTargetTransform != null)
+            {
+                if (!agent.pathPending &&
+                    (followTargetTransform.position + followTargetOffset) != agent.destination) // A check to see if the target object has moved                                               
+                {
+                    agent.SetDestination(followTargetTransform.position + followTargetOffset);
+                }
+            }
+            else
+            {
+                // Transform of the target object being null could mean that the target has been destroyed
+                // TODO Resolve such a scenario
+                hasFollowTarget = false;
+            }
+
+            yield return null;
+        }
     }
 }
