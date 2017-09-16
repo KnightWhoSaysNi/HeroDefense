@@ -8,7 +8,6 @@ public class EnemyData : ScriptableObject
 {
     // ADD TO CONST
     [Range(0, 1000)] public float maxHealth;
-    [Range(0, 1000)] public float currentHealth;
     [Range(0, 1000)] public float movementSpeed;
     [Range(0, 1000)] public int energyDrain;
     public float armor;
@@ -24,7 +23,6 @@ public class StrongEnemy
         strongEnemyData.maxHealth = 200;
         strongEnemyData.armor = 15;
         strongEnemyData.movementSpeed = 5;
-        strongEnemyData.currentHealth = 200;
 
         AssetDatabase.CreateAsset(strongEnemyData, AssetDatabase.GenerateUniqueAssetPath("Assets/Data/Enemies/StrongEnemy.asset"));       
         AssetDatabase.SaveAssets();

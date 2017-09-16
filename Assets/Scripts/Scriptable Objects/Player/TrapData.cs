@@ -12,15 +12,21 @@ public class TrapData : ScriptableObject
     /// </summary>
     [Tooltip("How often this trap attacks. In seconds.")]
     public float attackCooldown;
-    public TargetSystem targetSystem;
+    public TargetingSystem targetingSystem;
     public DamageType damageType;
     public AttackMode attackMode;
     
-    public float range;
-    public int maxNumberOfTargets;
+    public float attackRange; 
+    /// <summary>
+    /// If this is set to false max number of targets is used, otherwise that variable is ignored.
+    /// </summary>
+    public bool hitAllTargetsInRange;    
+    public int maxNumberOfTargets;     
+    public float areaOfEffectRange;
+    public float areaDamage;
 }
 
-public enum TargetSystem { SingleTarget, MultipleTargets, AreaOfEffect }
+public enum TargetingSystem { SingleTarget, MultipleTargets, AreaOfEffect }
 public enum AttackMode { SingleAttack, ContinuousAttack }
 public enum DamageType { Normal, Fire, Lightning, Poison }
 

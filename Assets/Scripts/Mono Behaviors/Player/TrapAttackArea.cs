@@ -6,16 +6,31 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class TrapAttackArea : MonoBehaviour
 {
-    public LayerMask enemyLayerMask; // TODO perhaps add to const?
-
-    private Dictionary<Collider, Enemy> enemiesInArea;
+    public LayerMask enemyLayerMask; // ADD TO CONST
+    public Dictionary<Collider, Enemy> enemiesInArea;
 
     public delegate void EnemyTrackHandler(Enemy enemy, bool isInAttackArea);
     public event EnemyTrackHandler EnemyMovementRegistered;
 
     private void Awake()
     {
-        enemiesInArea = new Dictionary<Collider, Enemy>();
+        enemiesInArea = new Dictionary<Collider, Enemy>();        
+    }
+
+    private void Start()
+    {
+        Enemy.EnemyDied += OnEnemyDied;
+    }
+
+    /// <summary>
+    /// If the enemy that has died was in enemiesInArea dictionary this removes that enemy by its provided collider key.
+    /// </summary>
+    private void OnEnemyDied(Enemy enemy, Collider enemyCollider)
+    {
+        if (enemiesInArea.ContainsKey(enemyCollider))
+        {
+            enemiesInArea.Remove(enemyCollider);
+        }
     }
 
     private void OnTriggerEnter(Collider other)

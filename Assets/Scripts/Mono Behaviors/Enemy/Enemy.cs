@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Renderer))]
+[RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(MoveAgent))]
 public class Enemy : MonoBehaviour
 {
@@ -13,86 +14,102 @@ public class Enemy : MonoBehaviour
     protected new Renderer renderer;
     protected Material originalMaterial;
 
-    [HideInInspector] public EnemyState state;
-    [HideInInspector] public int numberOfAttackers;
-    protected HashSet<Trap> continuousAttackers;
+     public EnemyState state;       // TODO hide in inspector
+     public bool isDead;            // TODO hide in inspector
+     public float currentHealth;    // TODO hide in inspector
+    protected Coroutine updateStateCoroutine; // TODO delete this if it's not being called in StopCoroutine
     protected WaitForSeconds minWaitInAttackedState;
-    protected bool isHit;    
+    protected bool isHit; 
 
-    public virtual void RegisterAttack(float damage, DamageType damageType, AttackMode attackMode, Trap attackingTrap = null) // TODO Incorporate different damage types into this method
+    private new Collider collider;
+
+    public static event System.Action<Enemy, Collider> EnemyDied;
+
+    /// <summary>
+    /// Tells the enemy that it has been attacked and provides information about that attack.
+    /// </summary>
+    public virtual void RegisterAttack(float damage, DamageType damageType) 
     {
         isHit = true;
 
-        if (attackMode == AttackMode.ContinuousAttack && attackingTrap != null)
+        if (state == EnemyState.NormalState)
         {
-            continuousAttackers.Add(attackingTrap);
-        }
+            // Enemy isn't in attacked state at the moment, so either there were no recent attackers
+            // or the current attacker's attack cooldown is greater than the minWaitInAttackedState time            
+            updateStateCoroutine = StartCoroutine(UpdateState());
+        }       
 
-        if (numberOfAttackers != 0)
-        {
-            // Enemy is already being attacked so just take damage // TODO maybe indicate that the enemy is hit again
-            enemyData.currentHealth -= damage; // TODO Write a check for hp dropping below 0            
-        }
-        else 
-        {
-            // Enemy isn't being attacked at the moment, this is the first attack/the start of a continuous attack
-            StartCoroutine(TakeDamage(damage));
-        }        
+        TakeDamage(damage, damageType);
     }
 
     protected virtual void Awake()
-    {        
-        state = EnemyState.NormalState;
+    {
+        state = EnemyState.NormalState;        
         moveAgent = GetComponent<MoveAgent>();
 
         renderer = GetComponent<Renderer>();
         originalMaterial = renderer.sharedMaterial;
         minWaitInAttackedState = new WaitForSeconds(0.1f); // ADD TO CONST 
+
+        currentHealth = enemyData.maxHealth;
+        collider = GetComponent<Collider>();
     }
 
-    protected virtual void Start()
+    /// <summary>
+    /// Calculates the final damage taken from the hit based on specified parameters and after taking into account the enemy data (like armor).
+    /// </summary>
+    /// <param name="damage">Base damage received.</param>
+    protected virtual void TakeDamage(float damage, DamageType damageType)
     {
-                
-    }
+        currentHealth -= damage;
 
-    protected virtual IEnumerator TakeDamage(float damage)
-    {
-        enemyData.currentHealth -= damage;
-           
-        // While there are still possible attackers once per frame check if they have attacked or not
-        while (numberOfAttackers > 0)
+        if (currentHealth <= 0)
         {
-            while (isHit)
-            {
-                // Enemy was hit since last iteration so it goes into attacked state and stays in it for minWaitInAttackedState seconds.
-                // isHit is set to false to stop an infinite cycle, but during the minWaitInAttackedState seconds this variable can be set to 
-                // true outside of this coroutine if the enemy is attacked again
-                isHit = false;
-                if (state != EnemyState.AttackedState)
-                {
-                    GoToAttackedState();
-
-                    while (continuousAttackers.Count > 0)
-                    {
-                        // While there is at least 1 attacker with a continuous attack mode there is no need to go back and forth 
-                        // between attacked state and normal state. The enemy should just stay in attacked state and every
-                        // minWaitInAttackedState seconds check the condition for staying in that state
-                        yield return minWaitInAttackedState; // TODO in the last iteration this will cause a double wait time. resolve that mayhaps?
-                    }
-                }
-                yield return minWaitInAttackedState;
-            }
-
-            // Not being attacked at this moment so go back to normal state, if not already in it
-            if (state != EnemyState.NormalState)
-            {
-                GoToNormalState();      
-            }
-
-            // Continue this loop in the next frame
-            yield return null;
+            //print(currentHealth);
+            Die();
         }
-    }    
+    }
+
+    int numberOfTimesDieWasCalled;
+    protected virtual void Die()
+    {
+        isDead = true;
+
+        numberOfTimesDieWasCalled++;
+        if (collider == null)
+        {
+            print("Collider is null and Die was called "+numberOfTimesDieWasCalled.ToString()+" times. Current fuckign health is: "+currentHealth);
+        }
+        
+        EnemyDied?.Invoke(this, collider);
+        // TODO Play death animation 
+        
+        Destroy(this.gameObject);
+    }
+
+    /// <summary>
+    /// Changes state based on whether or not the enemy is hit
+    /// </summary>
+    /// <returns></returns>
+    protected virtual IEnumerator UpdateState()
+    {
+        while (isHit)
+        {
+            // Enemy was hit since last iteration so it goes into attacked state and stays in it for minWaitInAttackedState.
+            // isHit is set to false to stop an infinite cycle, but during the minWaitInAttackedState this variable can be set to 
+            // true outside of this coroutine if the enemy is attacked again
+            isHit = false;
+            if (state != EnemyState.AttackedState)
+            {
+                GoToAttackedState();
+            }
+            yield return minWaitInAttackedState;
+        }
+
+        // Not being attacked at this moment so go back to normal state
+        GoToNormalState();        
+    }
+
 
     protected virtual void GoToAttackedState()
     {
@@ -105,7 +122,6 @@ public class Enemy : MonoBehaviour
         state = EnemyState.NormalState;
         renderer.material = originalMaterial;
     }
-
 }
 
 public enum EnemyState { NormalState, AttackedState }

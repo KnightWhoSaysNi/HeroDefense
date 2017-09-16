@@ -11,7 +11,6 @@ public class LevelManager : MonoBehaviour
     
     // Wave specific fields
     private Wave currentWave;
-    private int currentWaveIndex;
     private WaitForSeconds spawnCooldown;
     private WaitForSeconds additionalSpawnDelay = new WaitForSeconds(0);
     private int numberOfAliveEnemies;
@@ -21,13 +20,14 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
-        
+        Enemy.EnemyDied += OnEnemyDied;
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            numberOfAliveEnemies = 0;
             StopAllCoroutines();
             StartCoroutine(PlayLevel());
         }
@@ -47,7 +47,6 @@ public class LevelManager : MonoBehaviour
                 yield return new WaitForSeconds(level.levelElements[i].wave.startDelay);
 
                 currentWave = level.levelElements[i].wave;
-                currentWaveIndex = i;
 
                 // Play current wave
                 yield return PlayWave();
@@ -106,6 +105,17 @@ public class LevelManager : MonoBehaviour
         instantiatedEnemy.moveAgent.SetTarget(endPoint.position);
         
         numberOfAliveEnemies++;
+    }
+
+    /// <summary>
+    /// Reduces the number of alive enemies.
+    /// </summary>
+    /// <remarks>
+    /// Only spawned enemies can raise this event.
+    /// </remarks>
+    private void OnEnemyDied(Enemy enemy, Collider enemyCollider)
+    {
+        numberOfAliveEnemies--;
     }
 
     private bool IsWaveFinished()
