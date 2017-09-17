@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Renderer))]
 public class Trap : Placeable
 {
+    [Space(10)]
     public TrapData trapData;
     public float minTimeInAttackState;
     [Tooltip("Time it takes for the attack to connect with the target enemy after the trap has fired. " +
@@ -31,27 +31,17 @@ public class Trap : Placeable
     protected List<Enemy> affectedEnemies;
     protected Collider[] aoeColliders;
     protected Enemy currentEnemy;
-    protected Coroutine attackCoroutine;   
+    protected Coroutine attackCoroutine;     
 
-    [Space(10)]
-    public Material illegalPlacementMaterial;
-    protected Material originalMaterial;
-    protected new Renderer renderer;    
-
-    protected virtual void Start() // TODO check if this needs to be in Awake instead
+    protected new virtual void Start() // TODO check if this needs to be in Awake instead
     {
+        base.Start();
+
         state = TrapState.NormalState;
 
         if (trapData == null)
         {
             // TODO Resolve this situation. Throw an exception or use a blank trap data
-        }
-
-        renderer = GetComponent<Renderer>();
-        originalMaterial = renderer.sharedMaterial;
-        if (illegalPlacementMaterial == null)
-        {
-            illegalPlacementMaterial = new Material(originalMaterial) { color = Color.red };
         }
 
         enemiesInRange = new List<Enemy>();
@@ -65,23 +55,6 @@ public class Trap : Placeable
         trapAttackArea.EnemyMovementRegistered += OnEnemyMovementRegistered;
         Enemy.EnemyDied += OnEnemyDied;
     }
-
-    /// <summary>
-    /// A simple visual representation of the validity of the trap's placement. If it cannot be placed it changes its material 
-    /// to the specified illegal placement material, and sets it back to original material if it can be placed.
-    /// </summary>
-    protected override void DisplayPlacementValidity(bool canBePlaced)
-    {
-        if (canBePlaced)
-        {
-            renderer.material = originalMaterial;
-        }
-        else
-        {
-            renderer.material = illegalPlacementMaterial;
-        }
-    }
-
 
     protected virtual void OnEnemyDied(Enemy enemy, Collider enemyCollider)
     {

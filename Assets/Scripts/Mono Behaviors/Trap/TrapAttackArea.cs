@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(Rigidbody))]
 public class TrapAttackArea : MonoBehaviour
 {
     public LayerMask enemyLayerMask; // ADD TO CONST
@@ -14,7 +15,8 @@ public class TrapAttackArea : MonoBehaviour
 
     private void Awake()
     {
-        enemiesInArea = new Dictionary<Collider, Enemy>();        
+        enemiesInArea = new Dictionary<Collider, Enemy>();
+        GetComponent<Rigidbody>().isKinematic = true;
     }
 
     private void Start()
