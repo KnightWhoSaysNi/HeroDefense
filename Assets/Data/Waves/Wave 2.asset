@@ -8,10 +8,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdea55109b42e7d49a91441572ec9c16, type: 3}
-  m_Name: BlueEnemyd
+  m_Script: {fileID: 11500000, guid: 41fec79ee8d60014bbc90823961232ef, type: 3}
+  m_Name: Wave 2
   m_EditorClassIdentifier: 
-  maxHealth: 1000
-  movementSpeed: 33
-  energyDrain: 22
-  armor: 11
+  startDelay: 0
+  endDelay: 0
+  shouldRandomizeEnemies: 0
+  spawnRate: 0
+  enemies: []

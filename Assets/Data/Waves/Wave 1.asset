@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41fec79ee8d60014bbc90823961232ef, type: 3}
+  m_Name: Wave 1
+  m_EditorClassIdentifier: 
+  startDelay: 0
+  endDelay: 0
+  shouldRandomizeEnemies: 0
+  spawnRate: 1
+  waveElements:
+  - enemy: {fileID: 114970115917398916, guid: a70d7498fe25911438cc287c14f07888, type: 2}
+    minNumberOfEnemies: 60
+    maxNumberOfEnemies: 60
+    chanceOfAppearing: 1
+    delayBeforeSpawning: 0
+  - enemy: {fileID: 114503007417218412, guid: 806d5b9165719b64f91a24f7464e9f66, type: 2}
+    minNumberOfEnemies: 55
+    maxNumberOfEnemies: 55
+    chanceOfAppearing: 1
+    delayBeforeSpawning: 3

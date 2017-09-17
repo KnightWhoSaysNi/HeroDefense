@@ -9,12 +9,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fdea55109b42e7d49a91441572ec9c16, type: 3}
-  m_Name: EnemyData
+  m_Name: GreenEnemyData
   m_EditorClassIdentifier: 
-  enemyPrefab: {fileID: 1617265491685084, guid: 806d5b9165719b64f91a24f7464e9f66,
-    type: 2}
-  maxHealth: 0
-  currentHealth: 5.34
-  movementSpeed: 0
-  energyDrain: 0
+  maxHealth: 100
+  movementSpeed: 10
+  energyDrain: 1
   armor: 0

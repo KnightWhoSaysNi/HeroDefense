@@ -9,12 +9,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 583f9cdb5e9a4df4c807d5f4b7ecf6a6, type: 3}
-  m_Name: TutorialLevel
+  m_Name: LargeLevel
   m_EditorClassIdentifier: 
   levelElements:
   - wave: {fileID: 11400000, guid: f7f71e957e6a95d489cd4828112e1909, type: 2}
     waveCount: 1
-  - wave: {fileID: 11400000, guid: 3786dcd5202a43342b3fae6322284dd1, type: 2}
-    waveCount: 1
-  - wave: {fileID: 11400000, guid: aa0fb4d436be67a4cb198b93b9388005, type: 2}
+  - wave: {fileID: 11400000, guid: 422bbf23cf117fb4682c54b3400b215f, type: 2}
     waveCount: 1

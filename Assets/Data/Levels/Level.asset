@@ -8,10 +8,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdea55109b42e7d49a91441572ec9c16, type: 3}
-  m_Name: BlueEnemyd
+  m_Script: {fileID: 11500000, guid: 583f9cdb5e9a4df4c807d5f4b7ecf6a6, type: 3}
+  m_Name: Level
   m_EditorClassIdentifier: 
-  maxHealth: 1000
-  movementSpeed: 33
-  energyDrain: 22
-  armor: 11
+  waves:
+  - {fileID: 0}
