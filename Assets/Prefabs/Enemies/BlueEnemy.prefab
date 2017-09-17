@@ -42,9 +42,10 @@ GameObject:
   - component: {fileID: 23863883400067578}
   - component: {fileID: 195187091190605010}
   - component: {fileID: 114766069959928798}
-  m_Layer: 0
+  - component: {fileID: 114503007417218412}
+  m_Layer: 9
   m_Name: BlueEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -166,6 +167,22 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114503007417218412
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1617265491685084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50e85d7dc7cd40b42830337e1c48a30e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyData: {fileID: 11400000, guid: e96f73b922efe514eb8ac02ebaf70910, type: 2}
+  moveAgent: {fileID: 0}
+  hitMaterial: {fileID: 2100000, guid: a6433d7c87134344baa2bfedb2bd7356, type: 2}
+  state: 0
+  currentHealth: 0
 --- !u!114 &114766069959928798
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -177,9 +194,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b8136c31c6788b4fa57a454d20c6d85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!135 &135053591668473064
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -201,11 +215,11 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 10
+  m_Speed: 5
   m_Acceleration: 60
   avoidancePriority: 50
   m_AngularSpeed: 900
-  m_StoppingDistance: 0
+  m_StoppingDistance: 5
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
