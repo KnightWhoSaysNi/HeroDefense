@@ -92,9 +92,9 @@ GameObject:
   - component: {fileID: 65214343757415574}
   - component: {fileID: 54266065441321702}
   - component: {fileID: 114223797884865328}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: AttackArea
-  m_TagString: AttackArea
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -382,6 +382,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   position: {x: 0, y: 0, z: 0}
+  placementOffsetMutiplier: 0
   renderers:
   - {fileID: 23953601883229844}
   - {fileID: 23862605796001156}
@@ -390,6 +391,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: bb198718a8d8a534da207c4bd89c7a55, type: 2}
   - {fileID: 2100000, guid: 83a7149c67f045445a715861077cd4ab, type: 2}
   - {fileID: 2100000, guid: b161564b1cbc7bd4dbd14a857a148ad2, type: 2}
+  currentlyCollidedObjects: []
   trapData: {fileID: 11400000, guid: 0d64d2992234fca4194695aa06c57111, type: 2}
   minTimeInAttackState: 0
   attackHitDelay: 1

@@ -10,6 +10,13 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
 {    
     [HideInInspector]
     public Vector3 position;
+    /// <summary>
+    /// Value by which to multiple a normalized vector that is added to the placeable's local up position in order to raise/lower it. 
+    /// If left at 0 placeable won't be raised at all. Blender files should already be set correctly and don't need this value.
+    /// </summary>
+    [Tooltip("Value by which to multiple a normalized vector that is added to the placeable's local up position in order to raise/lower it." +
+        " If left at 0 placeable won't be raised at all. Blender files should already be set correctly and don't need this value.")]
+    public float placementOffsetMutiplier;    
 
     public Renderer[] renderers;                    // Renderes whose materials can change for valid/invalid placement and for placed object
     public Material[] transparentMaterials;         // Materials used by renderers to show valid placement    
@@ -20,8 +27,10 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
     private bool isInIllegalState;
 
     protected bool isPlaced;
-    private HashSet<Collider> currentlyCollided; // TODO If collided objects can dissapear they need to let this class know so it can remove them from the hash set (if they're in it)
-    private int numberOfCollisions;
+    // TODO If collided objects can dissapear they need to let this class know so it can remove them from the hash set (if they're in it)
+    // The placeable needs to have at least 1 collided object - the one one which it is being placed
+    public HashSet<GameObject> currentlyCollidedObjects; 
+    private int numberOfCollidedPlaceables;
 
     public bool IsPlaced
     {
@@ -52,53 +61,32 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
     {
         get
         {
-            return numberOfCollisions == 0;
+            return numberOfCollidedPlaceables == 0 && currentlyCollidedObjects.Count == 1; // TODO perhaps add another check currentlyCollidedObjects[0].CompareTag
         }
     }
 
-    protected virtual int NumberOfCollisions
+    protected virtual int NumberOfCollidedPlaceables
     {
         get
         {
-            return numberOfCollisions;
+            return numberOfCollidedPlaceables;
         }
         set
         {
-            numberOfCollisions = value;
-
-            if (numberOfCollisions > 0)
-            {
-                // If already in illegal state no need to go through this loop again
-                if (!isInIllegalState)
-                {
-                    isInIllegalState = true;
-                    for (int i = 0; i < countOfRenderers; i++)
-                    {
-                        renderers[i].material = illegalPlacementMaterials[i];
-                    }
-                }
-            }
-            else
-            {
-                // Going back from illegal state to legal placement state (no collided placeables)
-                isInIllegalState = false;
-                for (int i = 0; i < countOfRenderers; i++)
-                {
-                    renderers[i].material = transparentMaterials[i];
-                }
-            }
+            numberOfCollidedPlaceables = value;
+            CheckPlacementValidity();
         }
     }
 
     public void ResetCollisions()
     {
-        NumberOfCollisions = 0;
-        currentlyCollided.Clear();
+        NumberOfCollidedPlaceables = 0;
+        currentlyCollidedObjects.Clear();
     }
 
     protected virtual void Start()
     {
-        currentlyCollided = new HashSet<Collider>();
+        currentlyCollidedObjects = new HashSet<GameObject>();
 
         countOfRenderers = renderers.Length;
         originalMaterials = new Material[countOfRenderers];
@@ -130,23 +118,12 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
 
         if (other.CompareTag("Placeable")) // ADD TO CONST
         {
-            NumberOfCollisions++;
+            NumberOfCollidedPlaceables++;
         }
         else
-        {
-            if (other.CompareTag("AttackArea")) // ADD TO CONST
-            {
-                // Collider of a child object of this or the other placeable so it's ignored
-                return;
-            }
-
-            // Collider belongs to an object other than the placeable (or its children)
-            currentlyCollided.Add(other);
-
-            if (currentlyCollided.Count > 0)
-            {
-                NumberOfCollisions++;
-            }
+        {            
+            currentlyCollidedObjects.Add(other.gameObject);
+            CheckPlacementValidity();
         }
     }
 
@@ -160,22 +137,37 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
 
         if (other.CompareTag("Placeable")) 
         {
-            NumberOfCollisions--;
+            NumberOfCollidedPlaceables--;
         }        
         else 
         {
-            if (other.CompareTag("AttackArea")) // ADD TO CONST
-            {
-                // Collider of a child object of this or the other placeable so it's ignored
-                return;
-            }
-            
-            // Collider belongs to an object other than the placeable (or its children)
-            if (currentlyCollided.Count > 0)
-            {
-                NumberOfCollisions--;
-            }
-            currentlyCollided.Remove(other);
+            currentlyCollidedObjects.Remove(other.gameObject);
+            CheckPlacementValidity();
         }
     } 
+
+    private void CheckPlacementValidity()
+    {
+        if (numberOfCollidedPlaceables == 0 && currentlyCollidedObjects.Count == 1)
+        {
+            // Placement is legal
+            isInIllegalState = false;
+            for (int i = 0; i < countOfRenderers; i++)
+            {
+                renderers[i].material = transparentMaterials[i];
+            }
+        }
+        else
+        {
+            // Placement is illegal
+            if (!isInIllegalState)
+            {
+                isInIllegalState = true;
+                for (int i = 0; i < countOfRenderers; i++)
+                {
+                    renderers[i].material = illegalPlacementMaterials[i];
+                }
+            }
+        }
+    }
 }
