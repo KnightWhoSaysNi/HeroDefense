@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Placeable
   - Enemy
+  - AttackArea
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - Environment
   - Enemy
   - Trap
-  - 
+  - Player
   - 
   - 
   - 
