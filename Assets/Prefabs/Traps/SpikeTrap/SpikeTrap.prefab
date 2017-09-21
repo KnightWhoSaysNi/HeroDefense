@@ -20,9 +20,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4425165235531788}
   - component: {fileID: 65509308601517326}
+  - component: {fileID: 54595895083588914}
   - component: {fileID: 95761103934589686}
   - component: {fileID: 114963855062518344}
-  - component: {fileID: 54595895083588914}
   m_Layer: 10
   m_Name: SpikeTrap
   m_TagString: Placeable
@@ -145,7 +145,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1277460829683414}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 14.67, y: 0.72, z: -21.91}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4388022004654364}
@@ -325,7 +325,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 6, y: 3, z: 6}
+  m_Size: {x: 3, y: 3, z: 3}
   m_Center: {x: 0, y: 1.52, z: 0}
 --- !u!65 &65509308601517326
 BoxCollider:
@@ -337,7 +337,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 6, y: 0.45, z: 6}
+  m_Size: {x: 3, y: 0.45, z: 3}
   m_Center: {x: 0, y: 0.2, z: 0}
 --- !u!95 &95761103934589686
 Animator:
@@ -348,7 +348,7 @@ Animator:
   m_GameObject: {fileID: 1277460829683414}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: bc6cbdb117fe0ef48b7134dd17e79914, type: 2}
+  m_Controller: {fileID: 22100000, guid: 13706c1f0d387ea44b0dc3aaa66d4707, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -391,8 +391,12 @@ MonoBehaviour:
   - {fileID: 2100000, guid: bb198718a8d8a534da207c4bd89c7a55, type: 2}
   - {fileID: 2100000, guid: 83a7149c67f045445a715861077cd4ab, type: 2}
   - {fileID: 2100000, guid: b161564b1cbc7bd4dbd14a857a148ad2, type: 2}
+  illegalPlacementMaterial: {fileID: 2100000, guid: ed5a61447e3c58144999563dda4f95ba,
+    type: 2}
+  isPlaced: 0
   currentlyCollidedObjects: []
-  trapData: {fileID: 11400000, guid: 0d64d2992234fca4194695aa06c57111, type: 2}
-  minTimeInAttackState: 0
-  attackHitDelay: 1
+  trapData: {fileID: 11400000, guid: 2fc3542df629d5343bbf55c761fdbcd9, type: 2}
+  attackHitDelay: 0.03333333
   trapAttackArea: {fileID: 114223797884865328}
+  canAttackBeObstructed: 0
+  attackPosition: {fileID: 0}
