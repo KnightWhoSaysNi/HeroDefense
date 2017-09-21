@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Name: Wave 3
   m_EditorClassIdentifier: 
   startDelay: 0
-  endDelay: 0
+  endDelay: 63.7
   shouldRandomizeEnemies: 0
   spawnRate: 0
-  enemies: []
+  waveElements:
+  - enemy: {fileID: 114503007417218412, guid: 806d5b9165719b64f91a24f7464e9f66, type: 2}
+    minNumberOfEnemies: 1
+    maxNumberOfEnemies: 1
+    chanceOfAppearing: 1
+    delayBeforeSpawning: 0

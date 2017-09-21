@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Name: FastAoeAll
   m_EditorClassIdentifier: 
   cost: 0
-  damage: 10
-  attackCooldown: 0.15
+  damage: 25
+  attackCooldown: 0
   targetingSystem: 2
   damageType: 0
-  attackMode: 0
+  attackMode: 1
   attackRange: 11
   hitAllTargetsInRange: 1
   maxNumberOfTargets: 6

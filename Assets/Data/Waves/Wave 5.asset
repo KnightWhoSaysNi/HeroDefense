@@ -17,12 +17,12 @@ MonoBehaviour:
   spawnRate: 0.5
   waveElements:
   - enemy: {fileID: 114503007417218412, guid: 806d5b9165719b64f91a24f7464e9f66, type: 2}
-    minNumberOfEnemies: 5
-    maxNumberOfEnemies: 5
+    minNumberOfEnemies: 25
+    maxNumberOfEnemies: 25
     chanceOfAppearing: 1
     delayBeforeSpawning: 0
   - enemy: {fileID: 114970115917398916, guid: a70d7498fe25911438cc287c14f07888, type: 2}
-    minNumberOfEnemies: 15
-    maxNumberOfEnemies: 15
+    minNumberOfEnemies: 50
+    maxNumberOfEnemies: 50
     chanceOfAppearing: 1
     delayBeforeSpawning: 0.15

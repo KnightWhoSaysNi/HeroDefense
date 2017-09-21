@@ -15,13 +15,17 @@ public class TrapAttackArea : MonoBehaviour
 
     private void Awake()
     {
-        enemiesInArea = new Dictionary<Collider, Enemy>();
-        GetComponent<Rigidbody>().isKinematic = true;
+        enemiesInArea = new Dictionary<Collider, Enemy>();        
     }
 
     private void Start()
     {
         Enemy.EnemyDied += OnEnemyDied;
+    }
+
+    private void OnDisable()
+    {
+        enemiesInArea.Clear();
     }
 
     /// <summary>
@@ -40,12 +44,12 @@ public class TrapAttackArea : MonoBehaviour
         if (other.CompareTag("Enemy")) // ADD TO CONST
         {
             Enemy enemy = other.gameObject.GetComponent<Enemy>();
-            if (enemy != null)
+            // TODO The second check shouldn't really be necessary (dead enemies shouldn't move any more). Unless the trap itself moves
+            if (enemy != null && !enemy.isDead)  
             {
+                enemiesInArea.Add(other, enemy);           
                 EnemyMovementRegistered?.Invoke(enemy, true);
             }
-
-            enemiesInArea.Add(other, enemy);           
         }
     }
 
@@ -53,13 +57,12 @@ public class TrapAttackArea : MonoBehaviour
     {
         if (other.CompareTag("Enemy")) // ADD TO CONST
         {
-            // This should always be true, but the check is O(1)
-            if (enemiesInArea.ContainsKey(other)) 
+            if (enemiesInArea.ContainsKey(other))
             {
                 Enemy enemy = enemiesInArea[other];
                 enemiesInArea.Remove(other);
                 EnemyMovementRegistered?.Invoke(enemy, false);
-            }            
+            }
         }
     }
 }

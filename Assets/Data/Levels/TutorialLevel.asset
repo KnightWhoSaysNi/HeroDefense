@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Name: TutorialLevel
   m_EditorClassIdentifier: 
   levelElements:
-  - wave: {fileID: 11400000, guid: f7f71e957e6a95d489cd4828112e1909, type: 2}
-    waveCount: 1
   - wave: {fileID: 11400000, guid: 3786dcd5202a43342b3fae6322284dd1, type: 2}
+    waveCount: 1
+  - wave: {fileID: 11400000, guid: f7f71e957e6a95d489cd4828112e1909, type: 2}
     waveCount: 1
   - wave: {fileID: 11400000, guid: aa0fb4d436be67a4cb198b93b9388005, type: 2}
     waveCount: 1

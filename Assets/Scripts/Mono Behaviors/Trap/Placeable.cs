@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(BoxCollider))]
 [RequireComponent(typeof(Rigidbody))]
 public abstract class Placeable : MonoBehaviour // TODO Write custom editor for this class
 {    
@@ -22,15 +22,18 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
     public Material[] transparentMaterials;         // Materials used by renderers to show valid placement    
     private Material[] originalMaterials;           // Original materials that will be used by renderers when the object is placed
     private Material[] illegalPlacementMaterials;
+    public Material illegalPlacementMaterial; // TEST TODO Replace the illegalPlacementMaterials array with just 1 illegal placement material ADD TO CONST
     private Color illegalPlacementColor;
     private int countOfRenderers;
     private bool isInIllegalState;
 
-    protected bool isPlaced;
+    public bool isPlaced; // TEST Change back to protected
     // TODO If collided objects can dissapear they need to let this class know so it can remove them from the hash set (if they're in it)
     // The placeable needs to have at least 1 collided object - the one one which it is being placed
-    public HashSet<GameObject> currentlyCollidedObjects; 
+    public List<GameObject> currentlyCollidedObjects; // TEST Set this back to private HashSet
     private int numberOfCollidedPlaceables;
+
+    protected event Action PlaceablePlaced;
 
     public bool IsPlaced
     {
@@ -53,6 +56,8 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
                 {
                     renderers[i].material = originalMaterials[i];
                 }
+
+                PlaceablePlaced?.Invoke();
             }
         }
     }
@@ -78,15 +83,9 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
         }
     }
 
-    public void ResetCollisions()
+    protected void Awake()
     {
-        NumberOfCollidedPlaceables = 0;
-        currentlyCollidedObjects.Clear();
-    }
-
-    protected virtual void Start()
-    {
-        currentlyCollidedObjects = new HashSet<GameObject>();
+        currentlyCollidedObjects = new List<GameObject>();
 
         countOfRenderers = renderers.Length;
         originalMaterials = new Material[countOfRenderers];
@@ -106,6 +105,20 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
             // At the start this object is not yet placed so transparent materials are used
             renderers[i].material = transparentMaterials[i];
         }
+    }
+
+    protected void Start()
+    {
+        if (isPlaced)
+        {
+            IsPlaced = true;
+        }
+    }
+
+    protected void OnDisable()
+    {
+        NumberOfCollidedPlaceables = 0;
+        currentlyCollidedObjects.Clear();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -165,7 +178,8 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
                 isInIllegalState = true;
                 for (int i = 0; i < countOfRenderers; i++)
                 {
-                    renderers[i].material = illegalPlacementMaterials[i];
+                    //renderers[i].material = illegalPlacementMaterials[i];
+                    renderers[i].material = illegalPlacementMaterial;
                 }
             }
         }

@@ -13,10 +13,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cost: 0
   damage: 30
-  attackCooldown: 0.5
+  attackCooldown: 0
   targetingSystem: 0
   damageType: 0
-  attackMode: 0
+  attackMode: 1
   attackRange: 11
   hitAllTargetsInRange: 1
   maxNumberOfTargets: 15

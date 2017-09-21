@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Name: FastSingleTarget
   m_EditorClassIdentifier: 
   cost: 0
-  damage: 12
-  attackCooldown: 0.15
+  damage: 55
+  attackCooldown: 1
   targetingSystem: 0
   damageType: 0
   attackMode: 0

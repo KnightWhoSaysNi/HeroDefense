@@ -18,20 +18,20 @@ public class PlacementManager : MonoBehaviour
     [HideInInspector]
     public bool isInPlacementMode;
     private Vector3 lastPlacedPosition;
-    private Vector3 visualizationOffset; 
+    private Vector3 visualizationOffset;
     private Vector3 zFightingOffset;
     private float rotationAngleDegrees;
 
     void Start()
     {
         viewportCenter = new Vector3(0.5f, 0.5f, 0);
-        zFightingOffset = new Vector3(0.01f, 0.01f, 0.01f); // ADD TO CONST maybe?
+        zFightingOffset = new Vector3(0.001f, 0.001f, 0.001f); // ADD TO CONST maybe?
 
         mainCamera = Camera.main;
     }
 
     void Update()
-    {
+    {        
         if (Input.GetKeyDown(KeyCode.B))
         {            
             isInPlacementMode = !isInPlacementMode;
@@ -39,11 +39,6 @@ public class PlacementManager : MonoBehaviour
             if (activePlaceable != null)
             {
                 activePlaceable.gameObject.SetActive(isInPlacementMode);
-
-                if (!isInPlacementMode)
-                {
-                    activePlaceable.ResetCollisions();
-                }
             }
         }
 
@@ -86,6 +81,7 @@ public class PlacementManager : MonoBehaviour
                                 
                 if (Input.GetButtonDown("Fire1") && activePlaceable.CanBePlaced && placementPosition != lastPlacedPosition)
                 {
+                    // TODO the placeable can be placed, but now check if the player has enough gold for the actual trap
                     activePlaceable.IsPlaced = true;
                     activePlaceable.transform.position = placementPosition;
                     activePlaceable = null;
@@ -96,7 +92,6 @@ public class PlacementManager : MonoBehaviour
             else
             {
                 activePlaceable.gameObject.SetActive(false);
-                activePlaceable.ResetCollisions();
             }
         }
     }

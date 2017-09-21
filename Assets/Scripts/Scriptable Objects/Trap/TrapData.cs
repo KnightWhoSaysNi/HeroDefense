@@ -10,7 +10,7 @@ public class TrapData : ScriptableObject
     /// <summary>
     /// How often this trap attacks. In seconds.
     /// </summary>
-    [Tooltip("How often this trap attacks. In seconds.")]
+    [Tooltip("How often this trap attacks. In seconds. This should be synced with the attack animation.")]
     public float attackCooldown;
     public TargetingSystem targetingSystem;
     public DamageType damageType;

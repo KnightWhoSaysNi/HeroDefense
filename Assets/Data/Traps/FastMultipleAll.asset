@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Name: FastMultipleAll
   m_EditorClassIdentifier: 
   cost: 0
-  damage: 12
-  attackCooldown: 0.15
+  damage: 25
+  attackCooldown: 1
   targetingSystem: 1
   damageType: 0
-  attackMode: 0
+  attackMode: 1
   attackRange: 11
   hitAllTargetsInRange: 1
-  maxNumberOfTargets: 3
+  maxNumberOfTargets: 5
   areaOfEffectRange: 5
   areaDamage: 0

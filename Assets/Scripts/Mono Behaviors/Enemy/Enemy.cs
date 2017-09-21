@@ -70,21 +70,24 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    int numberOfTimesDieWasCalled;
+    public bool instantDeath;
+    private void Update()
+    {
+        if (instantDeath)
+        {
+            instantDeath = false;
+            TakeDamage(1000, DamageType.Normal);
+        }
+    }
+
     protected virtual void Die()
     {
         isDead = true;
-
-        numberOfTimesDieWasCalled++;
-        if (collider == null)
-        {
-            print("Collider is null and Die was called "+numberOfTimesDieWasCalled.ToString()+" times. Current fuckign health is: "+currentHealth);
-        }
         
         EnemyDied?.Invoke(this, collider);
         // TODO Play death animation 
         
-        Destroy(this.gameObject);
+        Destroy(this.gameObject, 0.5f); // ADD TO CONST TODO Check if adding a delay time for the destroy will give traps enough time to adjust to the death
     }
 
     /// <summary>

@@ -3,26 +3,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Trap : Placeable
+[RequireComponent(typeof(Animator))]
+public class Trap : Placeable // TODO make this class an abstract class and create a separate derived class for each targeting system
 {
     [Space(10)]
     public TrapData trapData;
-    public float minTimeInAttackState;
     [Tooltip("Time it takes for the attack to connect with the target enemy after the trap has fired. " +
         "This should be a very small value so the enemy doesn't leave the attack area by the time it gets hit." +
         "This should sync with the attack animation.")]
     [Range(0,1)] public float attackHitDelay;
     protected TrapState state;
     protected WaitForSeconds attackCooldown;
-    protected WaitForSeconds minWaitInAttackState;
     protected WaitForSeconds waitAttackHitDelay;
-    /// <summary>
-    /// <see cref="attackCooldown"/> time minus <see cref="minWaitInAttackState"/> seconds.
-    /// </summary>
-    protected WaitForSeconds restOfAttackCooldown;
+    protected bool hasWaitedForAttackHitDelay;
+    protected bool isWaitingForCooldown;
 
     [Space(10)]
     public TrapAttackArea trapAttackArea;
+    public bool canAttackBeObstructed; // TODO This should only be available for single target traps. (it gets A LOT more complicated for other targeting systems)
+    /// <summary>
+    /// This transform's position is used as origin for a ray cast towards the enemy to check if it can be attacked or if it's obstructed by something.
+    /// </summary>
+    public Transform attackPosition;
     protected List<Enemy> enemiesInRange;
     /// <summary>
     /// All other enemies, besides the current enemy, getting hit by the trap. 
@@ -31,11 +33,14 @@ public class Trap : Placeable
     protected List<Enemy> affectedEnemies;
     protected Collider[] aoeColliders;
     protected Enemy currentEnemy;
-    protected Coroutine attackCoroutine;     
+    protected Coroutine attackCoroutine;
+    protected bool isObstructed;
+        
+    protected Animator animator;
 
-    protected new virtual void Start() // TODO check if this needs to be in Awake instead
+    protected new void Awake() // TODO check if this needs to be in Awake instead
     {
-        base.Start();
+        base.Awake();
 
         state = TrapState.NormalState;
 
@@ -46,22 +51,34 @@ public class Trap : Placeable
 
         enemiesInRange = new List<Enemy>();
         affectedEnemies = new List<Enemy>();
-        aoeColliders = new Collider[trapData.hitAllTargetsInRange ? 300 : trapData.maxNumberOfTargets]; // ADD TO CONST arbitrary number chosen right now
+        aoeColliders = new Collider[trapData.hitAllTargetsInRange ? 300 : trapData.maxNumberOfTargets]; // ADD TO CONST 300 is arbitrary number used for testing
         attackCooldown = new WaitForSeconds(trapData.attackCooldown);
-        minWaitInAttackState = new WaitForSeconds(minTimeInAttackState);
-        restOfAttackCooldown = new WaitForSeconds(trapData.attackCooldown - minTimeInAttackState);
         waitAttackHitDelay = new WaitForSeconds(attackHitDelay);
 
+        PlaceablePlaced += OnTrapPlaced;
         trapAttackArea.EnemyMovementRegistered += OnEnemyMovementRegistered;
         Enemy.EnemyDied += OnEnemyDied;
+
+        animator = GetComponent<Animator>();
     }
 
+    protected new void OnDisable()
+    {
+        base.OnDisable();
+        enemiesInRange.Clear();
+        currentEnemy = null;
+    }
+
+    protected virtual void OnTrapPlaced()
+    {
+        // TODO Either put something here or make it abstract
+    }
+        
     protected virtual void OnEnemyDied(Enemy enemy, Collider enemyCollider)
     {
-        if (enemy == currentEnemy)
+        if (currentEnemy == enemy)
         {
-            currentEnemy = null;
-            UpdateCurrentEnemy();
+            StartCoroutine(UpdateCurrentEnemy());
         }
     }
 
@@ -80,9 +97,13 @@ public class Trap : Placeable
 
             if (enemiesInRange.Count == 1)
             {
-                // There were no enemies in range before adding this one, so start the attack sequence. Otherwise the attack is already running
                 currentEnemy = enemy;
-                attackCoroutine = StartCoroutine(Attack());
+
+                if (state == TrapState.NormalState)
+                {
+                    // There were no enemies in range before adding this one, so start the attack sequence. Otherwise the attack is already running
+                    attackCoroutine = StartCoroutine(Attack());
+                }                
             }
         }
         else
@@ -92,7 +113,7 @@ public class Trap : Placeable
 
             if (currentEnemy == enemy)
             {
-                UpdateCurrentEnemy();
+                StartCoroutine(UpdateCurrentEnemy());
             }            
         }
     }
@@ -101,52 +122,118 @@ public class Trap : Placeable
     /// Attacks enemies while there are enemies in range to attack. Goes from attack state to normal state based on the trap data.
     /// </summary>
     protected virtual IEnumerator Attack()
-    {
-        // While there is a current enemy, attack it every attackCooldown seconds
+    {        
+        while (isWaitingForCooldown)
+        {
+            yield return null;
+        }
+
+        // While there is a current enemy, attack it every attackCooldown seconds/frame (continuous attacks)
         while (currentEnemy != null)
         {
+            while (!isPlaced)
+            {
+                // The trap isn't placed yet, but it still needs to keep track of all its enemies for when it gets placed
+                yield return null;
+            }
+
+            // If there's a wall or some other obstacle blocking the shot at the current enemy the trap cannot attack yet
+            if (canAttackBeObstructed)
+            {
+                CheckIfObstructed();
+
+                // It's set up this way so that the attack coroutine doesn't lose a frame if there is no obstruction
+                while (isObstructed) 
+                {
+                    yield return null;
+                    CheckIfObstructed();
+                }
+
+                // Setting it back to true for the next frame or attack iteration
+                isObstructed = true;
+            }
+
             if (state != TrapState.AttackState)
             {
                 GoToAttackState();
             }
 
             // This is used so that enemies don't take damage in the same frame that the trap attacks, unless it is supposed to be instantaneous.
-            // There should be a small delay after starting the attack animation and atually hitting (and dealing damage to) the enemy - perhaps the animation time
-            yield return waitAttackHitDelay;
+            // There should be a small delay after starting the attack animation and atually hitting (and dealing damage to) the enemy - perhaps the attack animation time
+            if (attackHitDelay != 0)
+            {
+                if (trapData.attackMode == AttackMode.SingleAttack || !hasWaitedForAttackHitDelay)
+                {
+                    // SingleAttack traps wait for an attack hit delay every single attack
+                    // Continuous traps wait only for the first attack, after that they attack continuously (the attack animation is in a loop)
+                    yield return waitAttackHitDelay;
+                    hasWaitedForAttackHitDelay = true;
 
-            // There is a chance that all enemies in range were killed during the above delay and there is no one to deal damage to
+                    if (currentEnemy == null)
+                    {
+                        // Current enemy (and all others in range) died during the attack hit delay. State and cooldown resolved in StopAttackCoroutine()
+                        yield break;
+                    }
+                }                
+            }
+           
+            AttackEnemies();
+
             if (currentEnemy == null)
             {
-                yield return minWaitInAttackState;
-                break;
+                // Current enemy (and all others in range) died from the attack. State and cooldown resolved in StopAttackCoroutine()
+                yield break;
             }
-
-            AttackEnemies();
 
             if (trapData.attackMode == AttackMode.ContinuousAttack)
             {
-                // In continuous attack mode the trap fires after attack cooldown and stays in attack state
-                yield return attackCooldown;
+                // In continuous attack mode the trap deals damage every frame and so the attack cooldown should be 0 (but it won't change anything if it isn't)
+                yield return null;
             }
             else
             {
-                // Attack mode is single attack so after going into the attack state the trap stays in that state
-                // for minTimeInAttackState, then goes to normal state and then waits for the rest of the attack cooldown time
-                // before attacking again. (this way the attack cooldown stays the same)
-                yield return minWaitInAttackState;
                 GoToNormalState();
-                yield return restOfAttackCooldown;
-            }
-                        
-            if (currentEnemy == null)
-            {
-                // Current enemy is either out of range or it has died  
-                UpdateCurrentEnemy();
+                
+                isWaitingForCooldown = true;
+                yield return attackCooldown;
+                isWaitingForCooldown = false;
             }
         }
 
         // At this point there are no more enemies to attack
         GoToNormalState();
+    }
+
+    /// <summary>
+    /// Checks if the trap has a clean shot from the <see cref="attackPosition"/> to the current enemy.
+    /// </summary>
+    protected virtual void CheckIfObstructed()
+    {
+        if (currentEnemy == null)
+        {
+            return;
+        }
+
+        RaycastHit hit;
+        if (Physics.Raycast(attackPosition.position, currentEnemy.transform.position - attackPosition.position, out hit, 100f)) // ADD TO CONST?
+        {
+            if (((1 << hit.transform.gameObject.layer) & trapAttackArea.enemyLayerMask) != 0)
+            {
+                // Enemy was hit with the ray, meaning nothing is obstructing the attack
+                isObstructed = false;
+            }
+            else
+            {
+                // Enemy was not hit with the ray, meaning something is obstructing the attack
+                isObstructed = true;
+            }
+        }
+        else
+        {
+            // Nothing was hit with the ray. This shouldn't ever happen, but it's here just in case
+            print("Ray from trap to the current enemy didn't hit anything!"); // TEST
+        }
+
     }
 
     /// <summary>
@@ -157,7 +244,7 @@ public class Trap : Placeable
         switch (trapData.targetingSystem)
         {
             case TargetingSystem.SingleTarget:
-                AttackSingleEnemy();                
+                AttackSingleEnemy(currentEnemy, trapData.damage);                
                 break;
             case TargetingSystem.MultipleTargets:
                 UpdateEnemiesInRange();
@@ -171,13 +258,20 @@ public class Trap : Placeable
                 break;            
         }
     }
-
+    
     /// <summary>
     /// Attacks the current enemy;
     /// </summary>
-    protected virtual void AttackSingleEnemy()
-    {        
-        currentEnemy.RegisterAttack(trapData.damage, trapData.damageType);        
+    protected virtual void AttackSingleEnemy(Enemy enemy, float damage)
+    {
+        if (trapData.attackMode == AttackMode.ContinuousAttack)
+        {
+            enemy.RegisterAttack(damage * Time.deltaTime, trapData.damageType);
+        }
+        else
+        {
+            enemy.RegisterAttack(damage, trapData.damageType);        
+        }
     }
 
     /// <summary>
@@ -200,7 +294,6 @@ public class Trap : Placeable
         }
     }
 
-
     /// <summary>
     /// Finds enemies affected by the aoe attack close to the main target - currentEnemy.    
     /// </summary>
@@ -215,7 +308,7 @@ public class Trap : Placeable
         {
             Enemy affectedEnemy = aoeColliders[i].GetComponent<Enemy>();
 
-            if (affectedEnemy != null)
+            if (affectedEnemy != null) // TODO if affected enemy is not dead, there should be no need for a null check if the layer maks is set up correctly
             {
                 affectedEnemies.Add(affectedEnemy);
             }
@@ -236,19 +329,20 @@ public class Trap : Placeable
     /// Attacks multiple enemies. Either all enemies in range or a number of them, based on the trap data.
     /// </summary>
     protected virtual void AttackMultipleEnemies()
-    {       
+    {
         if (trapData.hitAllTargetsInRange)
         {
-            for (int i = 0; i < enemiesInRange.Count; i++)
+            // For loop goes in reverse to prevent skipping an element of the array if the count goes down (an enemy dies and reports it)
+            for (int i = enemiesInRange.Count - 1; i >= 0; i--)
             {
-                enemiesInRange[i].RegisterAttack(trapData.damage, trapData.damageType);
+                AttackSingleEnemy(enemiesInRange[i], trapData.damage);
             }
         }
         else // hit only a number of affected enemies
         {
             for (int i = 0; i < affectedEnemies.Count; i++)
             {
-                affectedEnemies[i].RegisterAttack(trapData.damage, trapData.damageType);
+                AttackSingleEnemy(affectedEnemies[i], trapData.damage);
             }
         }
     }
@@ -262,46 +356,28 @@ public class Trap : Placeable
         {
             if (affectedEnemies[i] == currentEnemy)
             {
-                currentEnemy.RegisterAttack(trapData.damage, trapData.damageType);
+                AttackSingleEnemy(currentEnemy, trapData.damage);
             }
             else
             {
                 affectedEnemies[i].RegisterAttack(trapData.areaDamage, trapData.damageType);
+                AttackSingleEnemy(affectedEnemies[i], trapData.areaDamage);
             }
         }
     }
-
-    // TODO create an event whose handler this will be
-    protected virtual void OnAttackConnected(Enemy enemy, float damage)
-    {
-        enemy.RegisterAttack(damage, trapData.damageType);
-    }
-
-
-    protected virtual void GoToAttackState()
-    {
-        state = TrapState.AttackState;
-        // TODO Play attack animation
-    }
-
-    protected virtual void GoToNormalState()
-    {
-        state = TrapState.NormalState;
-        // TODO Play idle animation or signal the stop of attack animation
-    }
-
 
     /// <summary>
     /// Goes through all enemies in range and sets the current enemy to the one that is closest to its target.
     /// If there are no more enemies in range the current enemy is set to null and trap has no targets to attack.
     /// </summary>
-    protected virtual void UpdateCurrentEnemy()
+    protected virtual IEnumerator UpdateCurrentEnemy()
     {
         UpdateEnemiesInRange();
 
         if (enemiesInRange.Count == 0)
         {
-            currentEnemy = null;
+            currentEnemy = null; // TEST Should this be before or after the stop attack coroutine
+            yield return StopAttackCoroutine();
         }
         else
         {
@@ -330,6 +406,73 @@ public class Trap : Placeable
             {
                 enemiesInRange.RemoveAt(i);
             }
+        }
+    }
+
+    /// <summary>
+    /// Stops the attack coroutine in an approprate way depending on the state of the trap and some other parameters.
+    /// </summary>
+    private IEnumerator StopAttackCoroutine()
+    {
+        if (state == TrapState.AttackState)
+        {
+            StopCoroutine(attackCoroutine); 
+            GoToNormalState();
+            
+            // Only single attacks have an attack cooldown, continuous attacks ignore such values if they were erroneously set
+            if (trapData.attackMode == AttackMode.SingleAttack)
+            {
+                // The trap attacked and since it was not waiting for the attack cooldown prior to this point it needs to wait for it now
+                isWaitingForCooldown = true;
+                yield return attackCooldown;
+                isWaitingForCooldown = false;
+            }
+        }
+        else if (isWaitingForCooldown)
+        {
+            // Trap is in normal state, but it is currently waiting for the attack cooldown and since it's impossible to know how long it has already waited
+            // the Attack sequence will have to continue and finish waiting for the cooldown. Afther that the attack coroutine will stop on its own
+            yield break;
+        }
+        else
+        {
+            // Trap is in normal state and it is not waiting for the attack cooldown
+            StopCoroutine(attackCoroutine);
+        }
+    }
+
+    protected virtual void GoToAttackState()
+    {
+        state = TrapState.AttackState;
+        hasWaitedForAttackHitDelay = false; 
+
+        switch (trapData.attackMode)
+        {
+            case AttackMode.SingleAttack:
+                animator.SetTrigger("Attacked"); // ADD TO CONST
+                break;
+            case AttackMode.ContinuousAttack:
+                animator.SetBool("IsAttacking", true); // ADD TO CONST
+                break;
+            default:
+                throw new UnityException("Trap.GoToAttackState has code only for two attack states.");
+        }
+    }
+
+    protected virtual void GoToNormalState()
+    {
+        state = TrapState.NormalState;
+
+        switch (trapData.attackMode)
+        {
+            case AttackMode.SingleAttack:
+                // By default single attack trap uses a trigger and nothing more is added here
+                break;
+            case AttackMode.ContinuousAttack:
+                animator.SetBool("IsAttacking", false); // ADD TO CONST
+                break;
+            default:
+                throw new UnityException("Trap.GoToAttackState has code only for two attack states.");
         }
     }
 }
