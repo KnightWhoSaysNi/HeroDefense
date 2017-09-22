@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 95761103934589686}
   - component: {fileID: 114963855062518344}
   m_Layer: 10
-  m_Name: SpikeTrap
+  m_Name: Spikes
   m_TagString: Placeable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -395,7 +395,7 @@ MonoBehaviour:
     type: 2}
   isPlaced: 0
   currentlyCollidedObjects: []
-  trapData: {fileID: 11400000, guid: 2fc3542df629d5343bbf55c761fdbcd9, type: 2}
+  trapData: {fileID: 11400000, guid: 8e5247881f759a4459cea683b1c21d2f, type: 2}
   attackHitDelay: 0.03333333
   trapAttackArea: {fileID: 114223797884865328}
   canAttackBeObstructed: 0

@@ -488,7 +488,7 @@ MonoBehaviour:
     type: 2}
   isPlaced: 0
   currentlyCollidedObjects: []
-  trapData: {fileID: 11400000, guid: 2fc3542df629d5343bbf55c761fdbcd9, type: 2}
+  trapData: {fileID: 11400000, guid: ee4ecd41c6ebd71418f20dcdb503d50f, type: 2}
   attackHitDelay: 0.13
   trapAttackArea: {fileID: 114890845063121512}
   canAttackBeObstructed: 1

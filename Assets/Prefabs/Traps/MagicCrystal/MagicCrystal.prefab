@@ -393,12 +393,11 @@ MonoBehaviour:
     type: 2}
   isPlaced: 0
   currentlyCollidedObjects: []
-  trapData: {fileID: 11400000, guid: d973e1c2959e830448b399626033331d, type: 2}
+  trapData: {fileID: 11400000, guid: 89b8048fb0ec52940929fa1e71f32a49, type: 2}
   attackHitDelay: 0
   trapAttackArea: {fileID: 114947936901005694}
-  canAttackBeObstructed: 0
+  canAttackBeObstructed: 1
   attackPosition: {fileID: 4429301319882678}
-  beamStart: {fileID: 4429301319882678}
 --- !u!114 &114947936901005694
 MonoBehaviour:
   m_ObjectHideFlags: 1
