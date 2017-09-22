@@ -7,6 +7,7 @@ TagManager:
   - Placeable
   - Enemy
   - AttackArea
+  - UIManager
   layers:
   - Default
   - TransparentFX
