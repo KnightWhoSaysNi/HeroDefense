@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
 {
-    public Placeable placeable; // TEST
-
-    private List<Placeable> availablePlaceables;
+    public List<Placeable> placeables;
+    [HideInInspector] public int placeableIndex;
     private Placeable activePlaceable;
 
-    [SerializeField] private LayerMask placementLayerMask;
+    [SerializeField]
+    private LayerMask placementLayerMask;
     private Camera mainCamera;
     private Vector3 viewportCenter;
     private Ray cameraRay;
@@ -22,16 +22,39 @@ public class PlacementManager : MonoBehaviour
     private Vector3 zFightingOffset;
     private float rotationAngleDegrees;
 
-    void Start()
+    private void Awake()
     {
-        viewportCenter = new Vector3(0.5f, 0.5f, 0);
-        zFightingOffset = new Vector3(0.001f, 0.001f, 0.001f); // ADD TO CONST maybe?
+        // Instead of making this class a "singleton" a simple check is made. This way only GameManager game object can have this mono behavior attached
+        if (GetComponent<GameManager>() == null)
+        {
+            throw new UnityException($"{gameObject.name} game object has a {typeof(PlacementManager)} MonoBehavior attached. Only GameManager is allowed to have that script.");
+        }
+    }
+
+    private void Start()
+    {      
+        viewportCenter = new Vector3(0.5f, 0.5f, 0);            // ADD TO CONST
+        zFightingOffset = new Vector3(0.001f, 0.001f, 0.001f);  // ADD TO CONST maybe?
 
         mainCamera = Camera.main;
     }
 
-    void Update()
-    {        
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            placeableIndex = 0;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            placeableIndex = 1;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            placeableIndex = 2;
+        }
+
+
         if (Input.GetKeyDown(KeyCode.B))
         {            
             isInPlacementMode = !isInPlacementMode;
@@ -47,7 +70,7 @@ public class PlacementManager : MonoBehaviour
             // A check to see if the current placeable is already placed. If it is not use that instance, and if it is already placed then instantiate a new placeable
             if (activePlaceable == null || activePlaceable.IsPlaced)
             {
-                activePlaceable = GameObject.Instantiate(placeable.gameObject).GetComponent<Placeable>(); // TEST // TODO Create an object pool
+                activePlaceable = GameObject.Instantiate(placeables[placeableIndex].gameObject).GetComponent<Placeable>(); // TEST // TODO Create an object pool
             }
             
             cameraRay = mainCamera.ViewportPointToRay(viewportCenter);

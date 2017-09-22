@@ -18,6 +18,15 @@ public class LevelManager : MonoBehaviour
     private bool shouldEnemiesAppear;
     private bool areAllEnemiesSpawned;
 
+    private void Awake()
+    {
+        // Instead of making this class a "singleton" a simple check is made. This way only GameManager game object can have this mono behavior attached
+        if (GetComponent<GameManager>() == null)
+        {
+            throw new UnityException($"{gameObject.name} game object has a {typeof(LevelManager)} MonoBehavior attached. Only GameManager is allowed to have that script.");
+        }
+    }
+
     private void Start()
     {
         Enemy.EnemyDied += OnEnemyDied;

@@ -62,8 +62,8 @@ public class LevelEditor : Editor
     private void OnEnable()
     {
         // Validation circles 
-        greenCircle = AssetDatabase.LoadAssetAtPath("Assets/Textures/GreenCircle.png", typeof(Texture)) as Texture; // ADD TO CONST !
-        redCircle = AssetDatabase.LoadAssetAtPath("Assets/Textures/RedCircle.png", typeof(Texture)) as Texture; // ADD TO CONST !
+        greenCircle = AssetDatabase.LoadAssetAtPath("Assets/Textures/Editor/GreenCircle.png", typeof(Texture)) as Texture; // ADD TO CONST !
+        redCircle = AssetDatabase.LoadAssetAtPath("Assets/Textures/Editor/RedCircle.png", typeof(Texture)) as Texture; // ADD TO CONST !
         if (greenCircle != null && redCircle != null)
         {
             greenCircleContent = new GUIContent(greenCircle);
