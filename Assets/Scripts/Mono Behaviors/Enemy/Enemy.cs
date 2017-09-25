@@ -25,6 +25,22 @@ public class Enemy : MonoBehaviour
 
     public static event System.Action<Enemy, Collider> EnemyDied;
 
+    public float MaxHealth
+    {
+        get
+        {
+            return enemyData.maxHealth;
+        }
+    }
+
+    public int Armor
+    {
+        get
+        {
+            return enemyData.armor;
+        }
+    }
+
     /// <summary>
     /// Tells the enemy that it has been attacked and provides information about that attack.
     /// </summary>

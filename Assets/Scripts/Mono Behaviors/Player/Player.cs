@@ -5,16 +5,19 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public int gold;
     public List<Spell> spells;
     public List<Trap> traps;
     public Inventory inventory;
 
-    [SerializeField] private int experience;
+    //private int gold;
+    //private int experience;
+    //private int level;
 
     public event Action LevelUp;
 
-    public int Level { get; private set; }
+    public int Gold { get; private set; }       // TODO Add an event for when Gold is incread
+    public int Experience { get; private set; } // TODO Add an event for when XP is increased
+    public int Level { get; private set; }      // TODO Add an event for when Level is increased
     public int NextLevelExperience
     {
         get
@@ -23,25 +26,62 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Start()
+    #region - "Singleton" Instance -
+    private static Player instance;
+
+    public static Player Instance
     {
+        get
+        {
+            if (instance == null)
+            {
+                throw new UnityException("Someone is calling Player.Instance before it is set!.");
+            }
+
+            return instance;
+        }
+    }
+
+    private void InitializeSingleton()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(this);
+
+            GameManager.Instance.Player = this;
+        }
+        else
+        {
+            DestroyImmediate(this.gameObject);
+        }
+    }
+    #endregion
+
+    private void Awake()
+    {
+        InitializeSingleton(); 
+
         // TODO Get player data from saved file if it exists
+        Level = 2;
+        Experience = 1325;
+        Gold = 750;
     }
 
     public void GainExperience(int xpAmount)
     {
-        if (xpAmount < 0)
-        {
-            // Currently it's not allowed to reduce xp
-            return;
-        }
+        //if (xpAmount < 0)
+        //{
+        //    // Currently it's not allowed to reduce xp
+        //    return;
+        //}
 
-        experience += xpAmount;
+        //experience += xpAmount;
 
-        while (experience >= NextLevelExperience)
-        {
-             IncreaseLevel();
-        }
+        //while (experience >= NextLevelExperience)
+        //{
+        //     IncreaseLevel();
+        //}
     }
     
     /// <summary>

@@ -2,19 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlacementManager : MonoBehaviour
+public class PlacementManager : Raycaster
 {
     public List<Placeable> placeables;
     [HideInInspector] public int placeableIndex;
     private Placeable activePlaceable;
-
-    [SerializeField]
-    private LayerMask placementLayerMask;
-    private Camera mainCamera;
-    private Vector3 viewportCenter;
-    private Ray cameraRay;
-    private RaycastHit placementHit;
-
+    
     [HideInInspector]
     public bool isInPlacementMode;
     private Vector3 lastPlacedPosition;
@@ -22,21 +15,17 @@ public class PlacementManager : MonoBehaviour
     private Vector3 zFightingOffset;
     private float rotationAngleDegrees;
 
-    private void Awake()
+    protected new void Awake()
     {
+        base.Awake();
+
         // Instead of making this class a "singleton" a simple check is made. This way only GameManager game object can have this mono behavior attached
         if (GetComponent<GameManager>() == null)
         {
             throw new UnityException($"{gameObject.name} game object has a {typeof(PlacementManager)} MonoBehavior attached. Only GameManager is allowed to have that script.");
         }
-    }
 
-    private void Start()
-    {      
-        viewportCenter = new Vector3(0.5f, 0.5f, 0);            // ADD TO CONST
         zFightingOffset = new Vector3(0.001f, 0.001f, 0.001f);  // ADD TO CONST maybe?
-
-        mainCamera = Camera.main;
     }
 
     private void Update()
@@ -67,26 +56,26 @@ public class PlacementManager : MonoBehaviour
 
         if (isInPlacementMode)
         {
-            // A check to see if the current placeable is already placed. If it is not use that instance, and if it is already placed then instantiate a new placeable
+            // A check to see if the active placeable is already placed. If it is not use that instance, and if it is already placed then instantiate a new placeable
             if (activePlaceable == null || activePlaceable.IsPlaced)
             {
                 activePlaceable = GameObject.Instantiate(placeables[placeableIndex].gameObject).GetComponent<Placeable>(); // TEST // TODO Create an object pool
             }
             
-            cameraRay = mainCamera.ViewportPointToRay(viewportCenter);
+            cameraRay = playerCamera.ViewportPointToRay(viewportCenter);
 
-            if (Physics.Raycast(cameraRay, out placementHit, 100, placementLayerMask))
+            if (Physics.Raycast(cameraRay, out raycastHit, 100f, raycastHitLayerMask))
             {
                 activePlaceable.gameObject.SetActive(true);
 
-                // In case the placeable's pivot point is not correctly set this offset raises/lowers it to a correct position for placement
-                visualizationOffset = placementHit.normal * activePlaceable.placementOffsetMutiplier + zFightingOffset;
+                // In case the placeable's pivot point is not correctly set, this offset raises/lowers it to a correct position for placement
+                visualizationOffset = raycastHit.normal * activePlaceable.placementOffsetMutiplier + zFightingOffset;
 
-                Vector3 visualizationPlacementPosition = placementHit.point + visualizationOffset;
+                Vector3 visualizationPlacementPosition = raycastHit.point + visualizationOffset;
                 Vector3 placementPosition = visualizationPlacementPosition - zFightingOffset;
 
                 activePlaceable.transform.position = visualizationPlacementPosition;                
-                activePlaceable.transform.rotation = Quaternion.FromToRotation(Vector3.up, placementHit.normal); 
+                activePlaceable.transform.rotation = Quaternion.FromToRotation(Vector3.up, raycastHit.normal); 
 
                 float scrollValue = Input.GetAxisRaw("Mouse ScrollWheel");                
                 if (scrollValue != 0)
@@ -94,13 +83,13 @@ public class PlacementManager : MonoBehaviour
                     scrollValue = scrollValue > 0 ? 1 : -1; // GetAxisRaw for scroll wheel doesn't return whole numbers
 
                     // Rotates the placeable by 5 degrees
-                    rotationAngleDegrees += scrollValue * 5; // TEST store the right values somewhere
+                    rotationAngleDegrees += scrollValue * 5; // TODO store the right values somewhere
                     if (rotationAngleDegrees == 360 || rotationAngleDegrees == -360)
                     {
                         rotationAngleDegrees = 0;
                     }
                 }
-                activePlaceable.transform.Rotate(placementHit.normal, rotationAngleDegrees, Space.World);
+                activePlaceable.transform.Rotate(raycastHit.normal, rotationAngleDegrees, Space.World);
                                 
                 if (Input.GetButtonDown("Fire1") && activePlaceable.CanBePlaced && placementPosition != lastPlacedPosition)
                 {
