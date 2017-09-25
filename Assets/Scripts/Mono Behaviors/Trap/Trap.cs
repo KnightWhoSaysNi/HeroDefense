@@ -7,6 +7,9 @@ using UnityEngine;
 public class Trap : Placeable // TODO make this class an abstract class and create a separate derived class for each targeting system
 {
     [Space(10)]
+    public Sprite thumbnail;
+
+    [Space(10)]
     public TrapData trapData;
     [Tooltip("Time it takes for the attack to connect with the target enemy after the trap has fired. " +
         "This should be a very small value so the enemy doesn't leave the attack area by the time it gets hit." +
@@ -19,6 +22,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     protected bool isWaitingForCooldown;
 
     [Space(10)]
+    public LayerMask obstructionLayerMask;
     public TrapAttackArea trapAttackArea;
     public bool canAttackBeObstructed; // TODO This should only be available for single target traps. (it gets A LOT more complicated for other targeting systems)
     /// <summary>
@@ -37,6 +41,14 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     protected bool isObstructed;
         
     protected Animator animator;
+
+    public int Cost
+    {
+        get
+        {
+            return trapData.cost;
+        }
+    }
 
     protected new void Awake() // TODO check if this needs to be in Awake instead
     {
@@ -215,7 +227,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
         }
 
         RaycastHit hit;
-        if (Physics.Raycast(attackPosition.position, currentEnemy.transform.position - attackPosition.position, out hit, 100f)) // ADD TO CONST?
+        if (Physics.Raycast(attackPosition.position, currentEnemy.transform.position - attackPosition.position, out hit, 100f, obstructionLayerMask)) // ADD TO CONST?
         {
             if (((1 << hit.transform.gameObject.layer) & trapAttackArea.enemyLayerMask) != 0)
             {
@@ -231,7 +243,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
         else
         {
             // Nothing was hit with the ray. This shouldn't ever happen, but it's here just in case
-            print("Ray from trap to the current enemy didn't hit anything!"); // TEST
+            print("Ray from trap to the current enemy didn't hit anything!");
         }
 
     }
@@ -376,7 +388,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
 
         if (enemiesInRange.Count == 0)
         {
-            currentEnemy = null; // TEST Should this be before or after the stop attack coroutine
+            currentEnemy = null; 
             yield return StopAttackCoroutine();
         }
         else
@@ -414,9 +426,17 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     /// </summary>
     private IEnumerator StopAttackCoroutine()
     {
-        if (state == TrapState.AttackState)
+        // TODO Check if this is necessary. Perhaps it cannot happen
+        if (attackCoroutine == null)
         {
-            StopCoroutine(attackCoroutine); 
+            // Enemy walked into the attack area and died/walked out, thus caused the UpdateCurrentEnemy call before the attack coroutine could even start the first time
+            print("AttackCoroutine is null. Delete this print and comments.");
+            yield break;
+        }
+
+        if (state == TrapState.AttackState)
+        {            
+            StopCoroutine(attackCoroutine);            
             GoToNormalState();
             
             // Only single attacks have an attack cooldown, continuous attacks ignore such values if they were erroneously set

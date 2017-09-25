@@ -22,7 +22,7 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
     public Material[] transparentMaterials;         // Materials used by renderers to show valid placement    
     private Material[] originalMaterials;           // Original materials that will be used by renderers when the object is placed
     private Material[] illegalPlacementMaterials;
-    public Material illegalPlacementMaterial; // TEST TODO Replace the illegalPlacementMaterials array with just 1 illegal placement material ADD TO CONST
+    public Material illegalPlacementMaterial; // TODO Replace the illegalPlacementMaterials array with just 1 illegal placement material ADD TO CONST
     private Color illegalPlacementColor;
     private int countOfRenderers;
     private bool isInIllegalState;
