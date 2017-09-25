@@ -41,7 +41,7 @@ GameObject:
   - component: {fileID: 33582003153113550}
   - component: {fileID: 23862605796001156}
   m_Layer: 10
-  m_Name: SpikePoints
+  m_Name: SpikesPoints
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -58,7 +58,7 @@ GameObject:
   - component: {fileID: 33366307296858570}
   - component: {fileID: 23953601883229844}
   m_Layer: 10
-  m_Name: SpikeBars
+  m_Name: SpikesBars
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -75,7 +75,7 @@ GameObject:
   - component: {fileID: 33427407048124598}
   - component: {fileID: 23718549843970988}
   m_Layer: 10
-  m_Name: Stand
+  m_Name: SpikesStand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -145,7 +145,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1277460829683414}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 14.67, y: 0.72, z: -21.91}
+  m_LocalPosition: {x: 3.2648869, y: 1.4699997, z: -73.40699}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4388022004654364}
@@ -181,7 +181,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 7d3ecab1d65f66847b4fbfa39eb50043, type: 2}
+  - {fileID: 2100000, guid: 5d9455b1ed9f4d043ae793e4f3f1c6ce, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -213,7 +213,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: de0e62c153eae734d96bf1063ec3473b, type: 2}
+  - {fileID: 2100000, guid: 5e693f32fb7049b479fe804f44e17b6a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -245,7 +245,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: dc365bb3a7042c243a0c31a39947af5d, type: 2}
+  - {fileID: 2100000, guid: d2be6148c9e87c047b81df359c1c54d1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -270,21 +270,21 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1524795714035454}
-  m_Mesh: {fileID: 4300002, guid: c44faf00891b684448044f98b5a0efae, type: 3}
+  m_Mesh: {fileID: 4300008, guid: c44faf00891b684448044f98b5a0efae, type: 3}
 --- !u!33 &33427407048124598
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1802159972703672}
-  m_Mesh: {fileID: 4300004, guid: c44faf00891b684448044f98b5a0efae, type: 3}
+  m_Mesh: {fileID: 4300010, guid: c44faf00891b684448044f98b5a0efae, type: 3}
 --- !u!33 &33582003153113550
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1312757636772638}
-  m_Mesh: {fileID: 4300000, guid: c44faf00891b684448044f98b5a0efae, type: 3}
+  m_Mesh: {fileID: 4300006, guid: c44faf00891b684448044f98b5a0efae, type: 3}
 --- !u!54 &54266065441321702
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -388,15 +388,19 @@ MonoBehaviour:
   - {fileID: 23862605796001156}
   - {fileID: 23718549843970988}
   transparentMaterials:
-  - {fileID: 2100000, guid: bb198718a8d8a534da207c4bd89c7a55, type: 2}
-  - {fileID: 2100000, guid: 83a7149c67f045445a715861077cd4ab, type: 2}
-  - {fileID: 2100000, guid: b161564b1cbc7bd4dbd14a857a148ad2, type: 2}
+  - {fileID: 2100000, guid: 43586d5930845c34f856525051052ec5, type: 2}
+  - {fileID: 2100000, guid: 0bde0ceb288efdf44a7da3eb0a00a323, type: 2}
+  - {fileID: 2100000, guid: c834ad8873272f14dbba648a29264e5c, type: 2}
   illegalPlacementMaterial: {fileID: 2100000, guid: ed5a61447e3c58144999563dda4f95ba,
     type: 2}
   isPlaced: 0
   currentlyCollidedObjects: []
+  thumbnail: {fileID: 21300000, guid: c0bf1cafc2efc034292db969d831cafa, type: 3}
   trapData: {fileID: 11400000, guid: 8e5247881f759a4459cea683b1c21d2f, type: 2}
   attackHitDelay: 0.03333333
+  obstructionLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294960127
   trapAttackArea: {fileID: 114223797884865328}
   canAttackBeObstructed: 0
   attackPosition: {fileID: 0}
