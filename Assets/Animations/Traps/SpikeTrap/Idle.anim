@@ -19,28 +19,28 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 2
         time: 0
-        value: {x: 0, y: -1.55, z: -0.000000006556709}
+        value: {x: 0, y: -1.57, z: -0.000000006556709}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: SpikePoints
+    path: SpikesPoints
   m_ScaleCurves:
   - curve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 2
         time: 0
-        value: {x: 0.1, y: 0.1, z: 0.15}
+        value: {x: 0.100000024, y: 0.100000024, z: 0.14}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: SpikeBars
+    path: SpikesBars
   m_FloatCurves: []
   m_PPtrCurves: []
   m_SampleRate: 60
@@ -51,14 +51,14 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 1233735101
+      path: 3918094966
       attribute: 1
       script: {fileID: 0}
       typeID: 4
       customType: 0
       isPPtrCurve: 0
     - serializedVersion: 2
-      path: 2152004684
+      path: 1297693634
       attribute: 3
       script: {fileID: 0}
       typeID: 4
@@ -91,7 +91,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 2
         time: 0
-        value: 0.1
+        value: 0.100000024
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -99,7 +99,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.x
-    path: SpikeBars
+    path: SpikesBars
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -107,7 +107,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 2
         time: 0
-        value: 0.1
+        value: 0.100000024
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -115,7 +115,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.y
-    path: SpikeBars
+    path: SpikesBars
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -123,7 +123,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 2
         time: 0
-        value: 0.15
+        value: 0.14
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -131,7 +131,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalScale.z
-    path: SpikeBars
+    path: SpikesBars
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -147,7 +147,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.x
-    path: SpikePoints
+    path: SpikesPoints
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -155,7 +155,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 2
         time: 0
-        value: -1.55
+        value: -1.57
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -163,7 +163,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.y
-    path: SpikePoints
+    path: SpikesPoints
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -179,7 +179,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.z
-    path: SpikePoints
+    path: SpikesPoints
     classID: 4
     script: {fileID: 0}
   m_EulerEditorCurves: []

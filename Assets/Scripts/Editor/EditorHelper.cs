@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public static class EditorHelper
@@ -92,10 +91,11 @@ public static class EditorHelper
         return true;
     }
 
+#if UNITY_EDITOR // TODO Move this to a different class
     /// <summary>
     /// Creates a blank wave asset in the Assets/Data/Waves folder or if it doesn't exist in the root Assets.
     /// </summary>
-    [MenuItem("Create/Wave")]
+    [UnityEditor.MenuItem("Create/Wave")]
     public static void CreateWaveAsset()
     {
         Wave wave = ScriptableObject.CreateInstance<Wave>();
@@ -103,13 +103,14 @@ public static class EditorHelper
         string waveSaveFolder = "Assets/Data/Waves"; // ADD TO CONST
 
         // If the wave save folder doesn't exist uses Assets main folder. In both cases unique files names are generated
-        string assetPath = AssetDatabase.IsValidFolder(waveSaveFolder) ? 
-            AssetDatabase.GenerateUniqueAssetPath(waveSaveFolder + "/Wave.asset") : AssetDatabase.GenerateUniqueAssetPath("Assets/Wave.asset");
+        string assetPath = UnityEditor.AssetDatabase.IsValidFolder(waveSaveFolder) ?
+            UnityEditor.AssetDatabase.GenerateUniqueAssetPath(waveSaveFolder + "/Wave.asset") : UnityEditor.AssetDatabase.GenerateUniqueAssetPath("Assets/Wave.asset");
 
-        AssetDatabase.CreateAsset(wave, assetPath);
-        AssetDatabase.SaveAssets();
+        UnityEditor.AssetDatabase.CreateAsset(wave, assetPath);
+        UnityEditor.AssetDatabase.SaveAssets();
 
-        EditorUtility.FocusProjectWindow();
-        Selection.activeObject = wave;              
+        UnityEditor.EditorUtility.FocusProjectWindow();
+        UnityEditor.Selection.activeObject = wave;              
     }
+#endif
 }

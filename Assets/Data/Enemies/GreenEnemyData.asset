@@ -14,4 +14,4 @@ MonoBehaviour:
   maxHealth: 100
   movementSpeed: 10
   energyDrain: 1
-  armor: 0
+  armor: 1

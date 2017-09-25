@@ -27,7 +27,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private AudioClip m_JumpSound;           // the sound played when character leaves the ground.
         [SerializeField] private AudioClip m_LandSound;           // the sound played when character touches back on ground.
 
-        private Camera m_Camera;
+        [Header("Player Camera")]
+        public Camera playerCamera;
         private bool m_Jump;
         private float m_YRotation;
         private Vector2 m_Input;
@@ -45,15 +46,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void Start()
         {
             m_CharacterController = GetComponent<CharacterController>();
-            m_Camera = Camera.main;
-            m_OriginalCameraPosition = m_Camera.transform.localPosition;
-            m_FovKick.Setup(m_Camera);
-            m_HeadBob.Setup(m_Camera, m_StepInterval);
+            //m_Camera = Camera.main;
+            m_OriginalCameraPosition = playerCamera.transform.localPosition;
+            m_FovKick.Setup(playerCamera);
+            m_HeadBob.Setup(playerCamera, m_StepInterval);
             m_StepCycle = 0f;
             m_NextStep = m_StepCycle/2f;
             m_Jumping = false;
             m_AudioSource = GetComponent<AudioSource>();
-			m_MouseLook.Init(transform , m_Camera.transform);
+			m_MouseLook.Init(transform , playerCamera.transform);
         }
 
 
@@ -101,7 +102,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             // get a normal for the surface that is being touched to move along it
             RaycastHit hitInfo;
             Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out hitInfo,
-                               m_CharacterController.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+                               m_CharacterController.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);            
             desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
             m_MoveDir.x = desiredMove.x*speed;
@@ -124,12 +125,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_MoveDir += Physics.gravity*m_GravityMultiplier*Time.fixedDeltaTime;
             }
-            m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);
+            m_CollisionFlags = m_CharacterController.Move(m_MoveDir * Time.fixedDeltaTime);
 
             ProgressStepCycle(speed);
             UpdateCameraPosition(speed);
-
-            m_MouseLook.UpdateCursorLock();
         }
 
 
@@ -185,18 +184,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             if (m_CharacterController.velocity.magnitude > 0 && m_CharacterController.isGrounded)
             {
-                m_Camera.transform.localPosition =
+                playerCamera.transform.localPosition =
                     m_HeadBob.DoHeadBob(m_CharacterController.velocity.magnitude +
                                       (speed*(m_IsWalking ? 1f : m_RunstepLenghten)));
-                newCameraPosition = m_Camera.transform.localPosition;
-                newCameraPosition.y = m_Camera.transform.localPosition.y - m_JumpBob.Offset();
+                newCameraPosition = playerCamera.transform.localPosition;
+                newCameraPosition.y = playerCamera.transform.localPosition.y - m_JumpBob.Offset();
             }
             else
             {
-                newCameraPosition = m_Camera.transform.localPosition;
+                newCameraPosition = playerCamera.transform.localPosition;
                 newCameraPosition.y = m_OriginalCameraPosition.y - m_JumpBob.Offset();
             }
-            m_Camera.transform.localPosition = newCameraPosition;
+            playerCamera.transform.localPosition = newCameraPosition;
         }
 
 
@@ -235,7 +234,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void RotateView()
         {
-            m_MouseLook.LookRotation (transform, m_Camera.transform);
+            m_MouseLook.LookRotation (transform, playerCamera.transform);
         }
 
 
@@ -252,7 +251,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 return;
             }
-            body.AddForceAtPosition(m_CharacterController.velocity*0.1f, hit.point, ForceMode.Impulse);
+            body.AddForceAtPosition(m_CharacterController.velocity * 0.1f, hit.point, ForceMode.Impulse);
         }
     }
 }

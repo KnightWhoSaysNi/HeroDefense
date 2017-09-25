@@ -8,11 +8,11 @@ public class Wave : ScriptableObject
     /// <summary>
     /// Delay before the wave starts.
     /// </summary>
-    [Range(0, 100)] public float startDelay; // ADD TO CONST
+    [Range(0, 100)] public float startDelay; // ADD TO CONST Range
     /// <summary>
     /// Delay after the wave is finished.
     /// </summary>
-    [Range(0, 100)] public float endDelay; // ADD TO CONST
+    [Range(0, 100)] public float endDelay; // ADD TO CONST Range
 
     /// <summary>
     /// False would spawn enemies as they are listed in the enemies field. True would randomize their order of appearance.
@@ -24,7 +24,7 @@ public class Wave : ScriptableObject
     /// How fast enemies will spawn - every specified second.
     /// </summary>
     [Tooltip("How fast enemies will spawn - every specified second.")]
-    [Range(0, 100)] public float spawnRate; // ADD TO CONST
+    [Range(0, 100)] public float spawnRate; // ADD TO CONST Range
 
     [Space(10)]
     /// <summary>
