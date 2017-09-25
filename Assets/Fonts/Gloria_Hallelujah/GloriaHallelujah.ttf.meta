@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: d8bfa36ebb7cfc641ab8a8424d41a779
+timeCreated: 1506170875
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Gloria Hallelujah
+  fontNames:
+  - Gloria Hallelujah
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
