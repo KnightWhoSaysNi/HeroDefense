@@ -29,13 +29,15 @@ public class TrapAttackArea : MonoBehaviour
     }
 
     /// <summary>
-    /// If the enemy that has died was in enemiesInArea dictionary this removes that enemy by its provided collider key.
+    /// If the enemy that has died was in <see cref="enemiesInArea"/> dictionary this removes that enemy by its provided collider key.
+    /// This is done so the dictionary doesn't grow too big if the level has a large number of enemies.
     /// </summary>
-    private void OnEnemyDied(Enemy enemy, Collider enemyCollider)
+    private void OnEnemyDied(Enemy enemy, Collider enemyCollider, bool hasFinishedLevel)
     {
         if (enemiesInArea.ContainsKey(enemyCollider))
         {
             enemiesInArea.Remove(enemyCollider);
+            EnemyMovementRegistered?.Invoke(enemy, false);
         }
     }
 
@@ -45,7 +47,7 @@ public class TrapAttackArea : MonoBehaviour
         {
             Enemy enemy = other.gameObject.GetComponent<Enemy>();
             // TODO The second check shouldn't really be necessary (dead enemies shouldn't move any more). Unless the trap itself moves
-            if (enemy != null && !enemy.isDead)  
+            if (enemy != null && !enemy.IsDead)  
             {
                 enemiesInArea.Add(other, enemy);           
                 EnemyMovementRegistered?.Invoke(enemy, true);

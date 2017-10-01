@@ -9,15 +9,72 @@ public class Player : MonoBehaviour
     public List<Trap> traps;
     public Inventory inventory;
 
-    //private int gold;
-    //private int experience;
-    //private int level;
+    private int gold;
+    private int experience;
+    private int level;
 
     public event Action LevelUp;
 
-    public int Gold { get; private set; }       // TODO Add an event for when Gold is incread
-    public int Experience { get; private set; } // TODO Add an event for when XP is increased
-    public int Level { get; private set; }      // TODO Add an event for when Level is increased
+    public int Gold
+    {
+        get
+        {
+            return gold;
+        }
+        set
+        {
+            gold = value;
+
+            if (gold < 0)
+            {
+                gold = 0;
+            }
+
+            UIManager.Instance.UpdatePlayerGold();
+        }
+    }
+    public int Experience
+    {
+        get
+        {
+            return experience;
+        }
+        set
+        {
+            experience = value;
+
+            if (experience < 0)
+            {
+                experience = 0;
+            }
+
+            while (experience >= NextLevelExperience)
+            {
+                Level++;
+            }
+
+            UIManager.Instance.UpdatePlayerExperience();
+        }
+    }
+    public int Level
+    {
+        get
+        {
+            return level;
+        }
+        private set
+        {
+            level = value;
+
+            if (level < 1)
+            {
+                level = 1;
+            }
+
+            LevelUp?.Invoke();
+            UIManager.Instance.UpdatePlayerLevel();
+        }
+    }
     public int NextLevelExperience
     {
         get
@@ -28,15 +85,16 @@ public class Player : MonoBehaviour
 
     #region - "Singleton" Instance -
     private static Player instance;
+    private static bool isBeingDisabled;
 
     public static Player Instance
     {
         get
         {
-            if (instance == null)
+            if (instance == null && !isBeingDisabled)
             {
-                throw new UnityException("Someone is calling Player.Instance before it is set!.");
-            }
+                throw new UnityException("Someone is calling Player.Instance before it is set! Change execution order.");
+            }   
 
             return instance;
         }
@@ -48,54 +106,28 @@ public class Player : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(this);
-
-            GameManager.Instance.Player = this;
         }
         else
         {
-            DestroyImmediate(this.gameObject);
+            Destroy(this.gameObject);
         }
     }
     #endregion
 
     private void Awake()
     {
-        InitializeSingleton(); 
-
-        // TODO Get player data from saved file if it exists
-        Level = 2;
-        Experience = 1325;
-        Gold = 750;
+        InitializeSingleton();
+        level = 1;
     }
 
-    public void GainExperience(int xpAmount)
-    {
-        //if (xpAmount < 0)
-        //{
-        //    // Currently it's not allowed to reduce xp
-        //    return;
-        //}
-
-        //experience += xpAmount;
-
-        //while (experience >= NextLevelExperience)
-        //{
-        //     IncreaseLevel();
-        //}
+    private void Start()
+    {        
     }
-    
-    /// <summary>
-    /// Increases the level by the specified amount. 
-    /// </summary>
-    private void IncreaseLevel(int increaseAmount = 1)
-    {
-        if (increaseAmount < 0)
-        {
-            // Currently it's not allowed to decrease a level
-            return;
-        }
 
-        Level += increaseAmount;
-        LevelUp?.Invoke();
+    private void OnDisable()
+    {
+        // Certain scripts call Player.Instance in their OnDisable methods. ApplicationQuit disables Player before disabling those scripts.
+        // This prevents a false positive exception throwing for trying to access Player.Instance before it has been set
+        isBeingDisabled = true;
     }
 }

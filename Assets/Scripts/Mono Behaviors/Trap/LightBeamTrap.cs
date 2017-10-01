@@ -12,6 +12,7 @@ public class LightBeamTrap : Trap
     {
         base.Awake();
 
+        // TODO After refactoring Trap and desolving it into multiple classes remove this check
         if (trapData.targetingSystem != TargetingSystem.SingleTarget)
         {
             throw new UnityException($"{gameObject.name}'s targeting system is not set to SingleTarget. LightBeamTraps can only be SingleTarget traps.");
@@ -31,10 +32,17 @@ public class LightBeamTrap : Trap
         }
     }
 
-    protected override void OnTrapPlaced()
+    protected override void OnPlaced()
     {
-        base.OnTrapPlaced();
+        base.OnPlaced();
 
         beam.SetPosition(0, attackPosition.position);
+    }
+
+    protected override void OnSold()
+    {
+        base.OnSold();
+
+
     }
 }

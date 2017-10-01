@@ -6,35 +6,52 @@ using UnityEngine.Rendering;
 
 [RequireComponent(typeof(BoxCollider))]
 [RequireComponent(typeof(Rigidbody))]
-public abstract class Placeable : MonoBehaviour // TODO Write custom editor for this class
-{    
+public abstract class Placeable : MonoBehaviour // TODO Write custom editor | Refactor
+{
+    public PlaceableType placeableType;
+    public GameObject rangeVisual;
+
+    [SerializeField]
+    protected int goldCost;
     [HideInInspector]
-    public Vector3 position;
+    protected Vector3 position;
     /// <summary>
     /// Value by which to multiple a normalized vector that is added to the placeable's local up position in order to raise/lower it. 
     /// If left at 0 placeable won't be raised at all. Blender files should already be set correctly and don't need this value.
     /// </summary>
     [Tooltip("Value by which to multiple a normalized vector that is added to the placeable's local up position in order to raise/lower it." +
         " If left at 0 placeable won't be raised at all. Blender files should already be set correctly and don't need this value.")]
-    public float placementOffsetMutiplier;    
+    [SerializeField] private float placementOffsetMultiplier;    
 
-    public Renderer[] renderers;                    // Renderes whose materials can change for valid/invalid placement and for placed object
-    public Material[] transparentMaterials;         // Materials used by renderers to show valid placement    
-    private Material[] originalMaterials;           // Original materials that will be used by renderers when the object is placed
-    private Material[] illegalPlacementMaterials;
-    public Material illegalPlacementMaterial; // TODO Replace the illegalPlacementMaterials array with just 1 illegal placement material ADD TO CONST
+    [SerializeField] private Renderer[] renderers;                    // Renderes whose materials can change for valid/invalid placement and for placed object
+    [SerializeField] private Material[] transparentMaterials;         // Materials used by renderers to show valid placement    
+    [SerializeField] private Material illegalPlacementMaterial; // TODO Replace the illegalPlacementMaterials array with just 1 illegal placement material ADD TO CONST
+    private Material[] originalMaterials;           // Original materials that will be used by renderers when the object is placed    
+
     private Color illegalPlacementColor;
     private int countOfRenderers;
     private bool isInIllegalState;
 
-    public bool isPlaced; // TEST Change back to protected
+    protected bool isPlaced;
     // TODO If collided objects can dissapear they need to let this class know so it can remove them from the hash set (if they're in it)
     // The placeable needs to have at least 1 collided object - the one one which it is being placed
     public List<GameObject> currentlyCollidedObjects; // TEST Set this back to private HashSet
     private int numberOfCollidedPlaceables;
 
-    protected event Action PlaceablePlaced;
-
+    public float PlacementOffsetMultiplier
+    {
+        get
+        {
+            return placementOffsetMultiplier;
+        }
+    }
+    public int GoldCost
+    {
+        get
+        {
+            return goldCost;
+        }
+    }
     public bool IsPlaced
     {
         get
@@ -49,7 +66,7 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
             {
                 // Whenever the placeable is placed its position is cached. 
                 // If it is removed the position doesn't need to be updated as it is not supposed to be called in that case
-                position = transform.position; // TODO perhaps add collider's bounds extents
+                position = transform.position; 
 
                 // Placed placeables use their original materials
                 for (int i = 0; i < countOfRenderers; i++)
@@ -57,11 +74,17 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
                     renderers[i].material = originalMaterials[i];
                 }
 
-                PlaceablePlaced?.Invoke();
+                OnPlaced();
+            }
+            else
+            {
+                for (int i = 0; i < countOfRenderers; i++)
+                {
+                    renderers[i].material = transparentMaterials[i];
+                }
             }
         }
     }
-
     public virtual bool CanBePlaced
     {
         get
@@ -69,7 +92,6 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
             return numberOfCollidedPlaceables == 0 && currentlyCollidedObjects.Count == 1; // TODO perhaps add another check currentlyCollidedObjects[0].CompareTag
         }
     }
-
     protected virtual int NumberOfCollidedPlaceables
     {
         get
@@ -83,14 +105,22 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
         }
     }
 
+    /// <summary>
+    /// Return the state of the placeable to before it was placed.
+    /// </summary>
+    public void Sell()
+    {        
+        OnSold();
+        // OnDisable will be called after this method as the game object will be deactivated
+    }
+
     protected void Awake()
     {
         currentlyCollidedObjects = new List<GameObject>();
 
         countOfRenderers = renderers.Length;
         originalMaterials = new Material[countOfRenderers];
-        illegalPlacementMaterials = new Material[countOfRenderers];
-        illegalPlacementColor = new Color(1, 0, 0, 0.75f);
+        illegalPlacementColor = new Color(1, 0, 0, 0.75f); // ADD TO CONST
 
         for (int i = 0; i < countOfRenderers; i++)
         {
@@ -100,7 +130,6 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
             // Create and cache illegal placement materials based on the original ones
             Material illegalPlacementMaterial = new Material(transparentMaterials[i]);
             illegalPlacementMaterial.color = illegalPlacementColor;
-            illegalPlacementMaterials[i] = illegalPlacementMaterial;
 
             // At the start this object is not yet placed so transparent materials are used
             renderers[i].material = transparentMaterials[i];
@@ -109,16 +138,31 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
 
     protected void Start()
     {
+        print("Refactor: Change public fields to serialized private fields wherever possible (which should be true for all scripts");
         if (isPlaced)
         {
             IsPlaced = true;
         }
     }
 
-    protected void OnDisable()
+    protected virtual void OnDisable()
     {
-        NumberOfCollidedPlaceables = 0;
+        IsPlaced = false;
+        isInIllegalState = false;
+        numberOfCollidedPlaceables = 0;       
         currentlyCollidedObjects.Clear();
+        rangeVisual.SetActive(true);
+    }
+
+    // Action to be overriden for each placeable that needs additional logic after it's been placed
+    protected virtual void OnPlaced()
+    {
+        rangeVisual.SetActive(false);
+    }
+
+    // Action to be overriden for each placeable that needs additional logic after it's been sold
+    protected virtual void OnSold()
+    {
     }
 
     private void OnTriggerEnter(Collider other)
@@ -129,12 +173,13 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
             return;
         }
 
-        if (other.CompareTag("Placeable")) // ADD TO CONST
+        if (other.CompareTag("Placeable") || other.CompareTag("Sellable")) // ADD TO CONST
         {
             NumberOfCollidedPlaceables++;
         }
-        else
-        {            
+        else if (!other.CompareTag("Enemy")) // ADD TO CONST
+        {
+
             currentlyCollidedObjects.Add(other.gameObject);
             CheckPlacementValidity();
         }
@@ -148,11 +193,11 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
             return;
         }
 
-        if (other.CompareTag("Placeable")) 
+        if (other.CompareTag("Placeable") || other.CompareTag("Sellable")) 
         {
             NumberOfCollidedPlaceables--;
         }        
-        else 
+        else if (!other.CompareTag("Enemy")) // ADD TO CONST
         {
             currentlyCollidedObjects.Remove(other.gameObject);
             CheckPlacementValidity();
@@ -161,7 +206,7 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
 
     private void CheckPlacementValidity()
     {
-        if (numberOfCollidedPlaceables == 0 && currentlyCollidedObjects.Count == 1)
+        if (numberOfCollidedPlaceables == 0 && currentlyCollidedObjects.Count == 1 && Player.Instance.Gold >= goldCost)
         {
             // Placement is legal
             isInIllegalState = false;
@@ -178,7 +223,6 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor for 
                 isInIllegalState = true;
                 for (int i = 0; i < countOfRenderers; i++)
                 {
-                    //renderers[i].material = illegalPlacementMaterials[i];
                     renderers[i].material = illegalPlacementMaterial;
                 }
             }

@@ -6,6 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class Trap : Placeable // TODO make this class an abstract class and create a separate derived class for each targeting system
 {
+    // TODO Set all fields that don't need to be public to [SerializeField] protected/private
     [Space(10)]
     public Sprite thumbnail;
 
@@ -46,7 +47,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     {
         get
         {
-            return trapData.cost;
+            return goldCost;
         }
     }
 
@@ -56,42 +57,34 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
 
         state = TrapState.NormalState;
 
-        if (trapData == null)
-        {
-            // TODO Resolve this situation. Throw an exception or use a blank trap data
-        }
-
         enemiesInRange = new List<Enemy>();
         affectedEnemies = new List<Enemy>();
         aoeColliders = new Collider[trapData.hitAllTargetsInRange ? 300 : trapData.maxNumberOfTargets]; // ADD TO CONST 300 is arbitrary number used for testing
         attackCooldown = new WaitForSeconds(trapData.attackCooldown);
         waitAttackHitDelay = new WaitForSeconds(attackHitDelay);
-
-        PlaceablePlaced += OnTrapPlaced;
+        
         trapAttackArea.EnemyMovementRegistered += OnEnemyMovementRegistered;
-        Enemy.EnemyDied += OnEnemyDied;
 
         animator = GetComponent<Animator>();
     }
 
-    protected new void OnDisable()
+    protected override void OnDisable()
     {
-        base.OnDisable();
+        base.OnDisable();        
         enemiesInRange.Clear();
         currentEnemy = null;
     }
 
-    protected virtual void OnTrapPlaced()
+    protected override void OnPlaced()
     {
-        // TODO Either put something here or make it abstract
+        base.OnPlaced();
+        // TODO Create and play some animation/sound
     }
-        
-    protected virtual void OnEnemyDied(Enemy enemy, Collider enemyCollider)
+
+    protected override void OnSold()
     {
-        if (currentEnemy == enemy)
-        {
-            StartCoroutine(UpdateCurrentEnemy());
-        }
+        base.OnSold();
+        GoToNormalState();
     }
 
     /// <summary>
@@ -133,7 +126,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     /// <summary>
     /// Attacks enemies while there are enemies in range to attack. Goes from attack state to normal state based on the trap data.
     /// </summary>
-    protected virtual IEnumerator Attack()
+    protected virtual IEnumerator Attack() // TODO REFACTOR !!!
     {        
         while (isWaitingForCooldown)
         {
@@ -313,7 +306,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     protected virtual void FindAreaTargetEnemies()
     {
         affectedEnemies.Clear();
-        
+
         int numberOfColliders = Physics.OverlapSphereNonAlloc(currentEnemy.transform.position, trapData.areaOfEffectRange, aoeColliders, trapAttackArea.enemyLayerMask);
 
         for (int i = 0; i < numberOfColliders; i++)
@@ -414,7 +407,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     {
         for (int i = enemiesInRange.Count - 1; i >= 0; i--)
         {
-            if (enemiesInRange[i].isDead)
+            if (enemiesInRange[i].IsDead)
             {
                 enemiesInRange.RemoveAt(i);
             }
@@ -429,8 +422,8 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
         // TODO Check if this is necessary. Perhaps it cannot happen
         if (attackCoroutine == null)
         {
-            // Enemy walked into the attack area and died/walked out, thus caused the UpdateCurrentEnemy call before the attack coroutine could even start the first time
-            print("AttackCoroutine is null. Delete this print and comments.");
+            // Enemy walked into the attack area and died/walked out, thus causing the UpdateCurrentEnemy call before the attack coroutine could even start the first time
+            print("AttackCoroutine is null. Delete this print.");
             yield break;
         }
 
@@ -475,7 +468,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
                 animator.SetBool("IsAttacking", true); // ADD TO CONST
                 break;
             default:
-                throw new UnityException("Trap.GoToAttackState has code only for two attack states.");
+                throw new UnityException("Trap.GoToAttackState has code for only two attack states.");
         }
     }
 
@@ -492,7 +485,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
                 animator.SetBool("IsAttacking", false); // ADD TO CONST
                 break;
             default:
-                throw new UnityException("Trap.GoToAttackState has code only for two attack states.");
+                throw new UnityException("Trap.GoToAttackState has code for only two attack states.");
         }
     }
 }

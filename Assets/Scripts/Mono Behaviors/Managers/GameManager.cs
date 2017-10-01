@@ -8,32 +8,11 @@ public class GameManager : MonoBehaviour
 {
     public Camera playerCamera;
     public UnityStandardAssets.Characters.FirstPerson.FirstPersonController playerController;
-    private Player player;
-
-    private PlacementManager placementManager;
-    private LevelManager levelManager;
-    private UIManager uiManager;
-
+    
     private bool canPauseGame;
 
-    public event Action PauseToggled;
+    public static event Action PauseStateChanged;
 
-    public Player Player
-    {
-        get
-        {
-            return player;
-        }
-        set
-        {
-            player = value;
-
-            if (player != null)
-            {
-                // TODO Do something here or delete the property
-            }
-        }
-    }      
     public bool IsGamePaused { get; private set; }
 
     #region - "Singleton" Instance -
@@ -45,12 +24,12 @@ public class GameManager : MonoBehaviour
         {
             if (instance == null)
             {
-                throw new UnityException("Someone is calling GameManager.Instance before it is set! Change script execution order.");                
+                throw new UnityException("Someone is calling GameManager.Instance before it is set! Change script execution order.");
             }
 
             return instance;
         }
-    } 
+    }
 
     private void InitializeSingleton()
     {
@@ -58,27 +37,27 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(this);
-
-            InitializeGameManager();
         }
         else
         {
-            DestroyImmediate(this.gameObject);
+            Destroy(this.gameObject);
         }
     }
-    #endregion    
+    #endregion
 
-    // TEST TODO Write this correctly
-    public void TogglePause(bool isPaused, bool shouldRaiseEvent)
+    /// <summary>
+    /// Goes in and out of paused state, enabling and disabling required components. Raises the PauseStateChanged event if so specified.
+    /// </summary>
+    public void ChangePauseState(bool isPaused, bool shouldRaiseEvent)
     {
         IsGamePaused = isPaused;
         if (shouldRaiseEvent)
         {
-            PauseToggled?.Invoke();
+            PauseStateChanged?.Invoke();
         }
 
         playerController.enabled = !isPaused;
-        placementManager.enabled = !isPaused;
+        PlacementManager.Instance.enabled = !isPaused;
         Cursor.visible = isPaused;
 
         if (isPaused)
@@ -98,35 +77,34 @@ public class GameManager : MonoBehaviour
         InitializeSingleton();
     }
 
+    private void Start()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        UIManager.LevelStarted += () => OnLevelStarted(false);
+        LevelManager.LevelRestarted += () => OnLevelStarted(true);
+        LevelManager.PlayerWon += OnGameEnd;
+        LevelManager.PlayerLost += OnGameEnd;
+
+        PlacementManager.Instance.playerCamera = playerCamera;
+    }
+
     private void Update()
-    {        
+    {
         // If #if UNITY_EDITOR is used the code in #else region has no IntelliSense so this alternative is used
-        if (Application.isEditor) 
+        if (Application.isEditor)
         {
             if (Input.GetKeyDown(KeyCode.P) && canPauseGame)
             {
-                TogglePause(!IsGamePaused, true);
+                ChangePauseState(!IsGamePaused, true);
             }
         }
         else
         {
             if (Input.GetKeyDown(KeyCode.Escape) && canPauseGame)
             {
-                TogglePause(!IsGamePaused, true);
+                ChangePauseState(!IsGamePaused, true);
             }
-        }        
-    }
-
-    private void InitializeGameManager()
-    {
-        levelManager = GetComponent<LevelManager>();
-        placementManager = GetComponent<PlacementManager>();
-        uiManager = GetComponent<UIManager>();
-
-        placementManager.playerCamera = playerCamera;
-        uiManager.playerCamera = playerCamera;
-
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        }
     }
 
     private void OnSceneLoaded(Scene loadedScene, LoadSceneMode loadedSceneMode)
@@ -134,22 +112,30 @@ public class GameManager : MonoBehaviour
         if (loadedScene.name == "MainMenu") // ADD TO CONST
         {
             playerController.enabled = false;
-            placementManager.enabled = false;
+            PlacementManager.Instance.enabled = false;
 
             canPauseGame = false;
         }
         else if (loadedScene.name != "GameplayUI") // ADD TO CONST 
         {
             // Level scene loaded
-            Player.transform.position = LevelManager.PlayerStartBearings.position;
-            Player.transform.rotation = LevelManager.PlayerStartBearings.rotation;
-
             if (!IsGamePaused)
             {
-                TogglePause(true, false); // TODO
+                ChangePauseState(true, false); 
             }
 
-            canPauseGame = true;
+            canPauseGame = false;
         }
-    }    
+    }
+    
+    private void OnLevelStarted(bool isLevelRestarted)
+    {
+        canPauseGame = !isLevelRestarted;
+    }
+
+    private void OnGameEnd()
+    {
+        canPauseGame = false;
+        ChangePauseState(true, false);
+    }
 }
