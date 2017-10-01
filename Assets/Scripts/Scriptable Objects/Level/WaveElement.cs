@@ -25,5 +25,6 @@ public class WaveELement
     /// Chance of enemies (even) appearing in a wave, regardless of their number. Default is 1 (100%).
     /// </summary>
     [Range(0, 1)] public float chanceOfAppearing = 1; // ADD TO CONST
-    public float delayBeforeSpawning = 0;
+    [Tooltip("Additional delay on top of the spawn rate. Used for an animation perhaps or a boss spawn announcement.")]
+    public float additionalSpawnDelay = 0;
 }

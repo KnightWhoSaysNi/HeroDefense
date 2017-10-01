@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "TrapData")]
-public class TrapData : ScriptableObject
+public class TrapData : ScriptableObject // TODO Break this into several classes when Trap is refactored
 {
-    public int cost;
     public float damage;
     /// <summary>
     /// How often this trap attacks. In seconds.
