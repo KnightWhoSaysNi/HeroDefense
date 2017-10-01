@@ -11,12 +11,64 @@ public class UIManager : Raycaster
     private GameplayUIData gameplayUIData;
     private MainMenuUIData mainMenuUIData;
 
-    private readonly string levelStartMessage = "Press G to start"; // ADD TO CONST ?
-    private bool shouldTogglePauseMenu;
-    
+    // ADD TO CONST
+    private readonly string levelStartMessage = "Press G to start";
+    private readonly string waveStartedMessage = "Wave started";
+    private readonly string finalWaveMessage = "Final wave";
+    /// <summary>
+    /// Amount of seconds to keep the message visible
+    /// </summary>
+    private readonly float defaultMessageAliveTime = 4;
+
+    private bool isRightClickRegistered;
+
+    private bool isPauseToggled;
+    private bool shouldRaycastForInformation;
+
+    private bool shouldShowCountdown;
+    private bool isFinalWave;
+    private bool shouldShowMessage;
+    private float countdownTimer;
+    private float countdownWholeNumber;
+    private float messageTimer;
+
     private int activeSlotIndex;
     private Enemy activeEnemy;
+    private Placeable activePlaceable;
     private Player player;
+
+    public static event Action LevelStarted;
+
+    /// <summary>
+    /// Returns true only if gameplayUIData has been received and UIManager can manipulate UI elements of the GameplayUI scene.
+    /// </summary>
+    public bool IsReadyToReceiveUpdates // TODO See who else can benefit from using this
+    {
+        get
+        {
+            return gameplayUIData != null;
+        }
+    }
+    private Placeable ActivePlaceable
+    {
+        get
+        {
+            return activePlaceable;
+        }
+        set
+        {
+            if (activePlaceable != value)
+            {
+                // Deactivate current active placeable's range visual before setting the new active placeable
+                if (activePlaceable != null)
+                {
+                    activePlaceable.rangeVisual.SetActive(false);
+                }
+
+                activePlaceable = value;
+            }
+        }
+    }
 
     #region - "Singleton" Instance -
     private static UIManager instance;
@@ -43,11 +95,11 @@ public class UIManager : Raycaster
         }
         else
         {
-            DestroyImmediate(this.gameObject);
+            Destroy(this.gameObject);
         }
     }
 
-    #endregion    
+    #endregion
 
 
     /// <summary>
@@ -68,13 +120,17 @@ public class UIManager : Raycaster
     public void SetUpGameplayUI(GameplayUIData gameplayUIData)
     {
         this.gameplayUIData = gameplayUIData;
+
         ResetGameplayUI();
         SetUpGameplayMenuHandlers();
     }
 
     #region - Main Menu UI -
 
-    public void ToggleCrosshair(bool isActive)
+    /// <summary>
+    /// Activates/deactivates the crosshair.
+    /// </summary>
+    public void CrosshairSetActive(bool isActive)
     {
         gameplayUIData.crosshair.SetActive(isActive);
     }
@@ -100,12 +156,85 @@ public class UIManager : Raycaster
         //mainMenuUIData.encyclopedia.onClick.AddListener
         //mainMenuUIData.options.onClick.AddListener
         mainMenuUIData.quit.onClick.AddListener(Quit);
-        mainMenuUIData.tutorialLevel.onClick.AddListener(() => SceneLoader.Instance.LoadScene("TutorialLevel")); // ADD TO CONST
+        mainMenuUIData.tutorialLevel.onClick.AddListener(SceneLoader.Instance.LoadTutorialLevel);
     }
 
     #endregion
 
     #region - Gameplay UI -
+
+    public void ResetGameplayUI()
+    {
+        PrepareForSceneChange(false);
+
+        CrosshairSetActive(false);
+        gameplayUIData.enemyCanvas.SetActive(false);
+        gameplayUIData.placeableCanvas.SetActive(false);
+        gameplayUIData.messagingCanvas.SetActive(false);
+        gameplayUIData.menuCanvas.SetActive(true);
+
+        ShowMenuPanel(gameplayUIData.levelStartPanel);
+        ChangeActiveSlot(0);
+
+        UpdatePlayerStats();
+
+        // TODO until more traps and some spells are created and until the option of choosing what is to be used in a level is implemented
+        // ui manager slots are set up from here - simply using all the traps the player has
+        for (int i = 0; i < player.traps.Count; i++)
+        {
+            SetUpSlot(i, player.traps[i]);
+        }
+    }
+
+    private void SetUpGameplayMenuHandlers()
+    {
+        gameplayUIData.levelStartTest.onClick.AddListener(OnTrapsChosen);
+
+        gameplayUIData.levelEndGoToMainMenu.onClick.AddListener(GoToMainMenu);
+        gameplayUIData.levelEndRestart.onClick.AddListener(Restart);
+        gameplayUIData.levelEndGoToNextLevel.onClick.AddListener(() => { print("NOT IMPLEMENTED!"); GoToNextLevel(); });
+
+        gameplayUIData.pauseContinue.onClick.AddListener(() => GameManager.Instance.ChangePauseState(false, true));
+        gameplayUIData.pauseRestart.onClick.AddListener(Restart);
+        gameplayUIData.pauseGoToMainMenu.onClick.AddListener(GoToMainMenu);
+        gameplayUIData.pauseQuit.onClick.AddListener(Quit); 
+    }
+
+    private void Restart()
+    {
+        ResetGameplayUI();
+        gameplayUIData.menuGraphicRaycaster.enabled = true;
+
+        LevelManager.Instance.RestartLevel();
+
+        shouldRaycastForInformation = true; 
+    }
+
+    private void GoToMainMenu()
+    {
+        PrepareForSceneChange(true);
+        SceneLoader.Instance.LoadMainMenu();
+    }
+
+    /// <summary>
+    /// Sets certain values to allow for a scene change.
+    /// </summary>
+    private void PrepareForSceneChange(bool shouldChangeTimeScale)
+    {
+        PlaceablePool.Instance.ReclaimAllObjects();
+        EnemyPool.Instance.ReclaimAllObjects();
+
+        shouldRaycastForInformation = false;
+        shouldShowCountdown = false;
+        shouldShowMessage = false;
+
+        if (shouldChangeTimeScale)
+        {
+            // Canvas fading won't allow changing the scene if time scale isn't 1
+            Time.timeScale = 1;
+        }
+    }
+
     #region - Player Stats -
     public void UpdatePlayerStats()
     {
@@ -127,7 +256,10 @@ public class UIManager : Raycaster
 
     public void UpdatePlayerGold()
     {
-        gameplayUIData.playerGold.text = player.Gold.ToString();
+        if (gameplayUIData != null)
+        {
+            gameplayUIData.playerGold.text = player.Gold.ToString();
+        }
     }
     #endregion
 
@@ -147,46 +279,24 @@ public class UIManager : Raycaster
     /// <summary>
     /// Activates and deactivates the slots canvas.
     /// </summary>
-    public void ToggleSlotsCanvas(bool isActive)
+    public void SlotsCanvasSetActive(bool isActive)
     {
         gameplayUIData.slotsCanvas.SetActive(isActive);
     }
 
     /// <summary>
-    /// Empties all the slots by setting their Trap property to null.
-    /// </summary>
-    public void ClearSlots()
-    {
-        for (int i = 0; i < gameplayUIData.slots.Length - 1; i++)
-        {
-            gameplayUIData.slots[i].Trap = null;
-        }
-    }
-
-    /// <summary>
-    /// Sets up the slot at the specified index with the specified trap.
-    /// </summary>
-    /// <param name="slotIndex">Slot index value = [0, slots.length).</param>
-    /// <param name="slotTrap">A trap for the slot or null if the slot should be empty.</param>
-    public void SetUpSlot(int slotIndex, Trap slotTrap)
-    {
-        CheckSlotIndexValidity(slotIndex);
-
-        gameplayUIData.slots[slotIndex].Trap = slotTrap;
-    }
-
-    /// <summary>
-    /// Changes the currently active slot and activates its selection highlight. Deactivates highlight selection on all other slots (the previously active one).
+    /// Change the currently active slot and activate its selection highlight. Deactivates highlight selection the previously active slot.
     /// </summary>
     /// <param name="slotIndex">0 based index of the selected slot.</param>
     public void ChangeActiveSlot(int slotIndex)
     {
         if (activeSlotIndex != slotIndex)
         {
-            CheckSlotIndexValidity(slotIndex);
             activeSlotIndex = slotIndex;
 
-            for (int i = 0; i < gameplayUIData.slots.Length; i++)
+            int numberOfUsedSlots = gameplayUIData.slots.Length;
+
+            for (int i = 0; i < numberOfUsedSlots; i++)
             {
                 if (i == slotIndex)
                 {
@@ -200,130 +310,121 @@ public class UIManager : Raycaster
         }
     }
 
-    private void CheckSlotIndexValidity(int slotIndex)
+    /// <summary>
+    /// Empties all the slots by setting their Trap property to null.
+    /// </summary>
+    private void ClearSlots()
     {
-        if (slotIndex < 0 || slotIndex > gameplayUIData.slots.Length - 1)
+        for (int i = 0; i < gameplayUIData.slots.Length - 1; i++)
         {
-            throw new UnityException("Slot index specified is invalid! Choose a number between 0 (inclusive) and the lenght of the available slots (exclusive).");
+            gameplayUIData.slots[i].Trap = null;
         }
+    }
+
+    /// <summary>
+    /// Sets up the slot at the specified index with the specified trap.
+    /// </summary>
+    /// <param name="slotIndex">Slot index value = [0, slots.length).</param>
+    /// <param name="slotTrap">A trap for the slot or null if the slot should be empty.</param>
+    private void SetUpSlot(int slotIndex, Trap slotTrap)
+    {
+        gameplayUIData.slots[slotIndex].Trap = slotTrap;
     }
 
     // TODO When more traps and spells are added create a way to choose which ones are used in a level and a way to rearange the order of elements 
     #endregion
 
-    #region - Enemy Health -
+    #region - Enemy Information -
+
     /// <summary>
-    /// Activates and deactivates the enemy health canvas.
+    /// Displays active enemy's info in the enemy canvas.
     /// </summary>
-    private void ToggleEnemyHealthCanvas(bool isActive)
+    private void UpdateEnemyInfo()
     {
-        gameplayUIData.enemyHealthCanvas.SetActive(isActive);
+        UpdateEnemyHealth(activeEnemy.CurrentHealth, activeEnemy.MaxHealth);
+        UpdateEnemyArmor(activeEnemy.Armor);
     }
 
-    private void UpdateEnemyInfo(Enemy enemy)
-    {
-        UpdateEnemyHealth(enemy.currentHealth, enemy.MaxHealth);
-        UpdateEnemyArmor(enemy.Armor);
-    }
-
+    /// <summary>
+    /// Updates the displayed enemy's health text and health bar value.
+    /// </summary>
     private void UpdateEnemyHealth(float currentHealth, float maxHealth)
     {
         gameplayUIData.enemyHealth.text = (int)currentHealth + "/" + (int)maxHealth;
         gameplayUIData.enemyHealthBar.value = currentHealth / maxHealth;
     }
 
+    /// <summary>
+    /// Updates the displayed enemy's armor.
+    /// </summary>
     private void UpdateEnemyArmor(int armor)
     {
         gameplayUIData.enemyArmor.text = armor.ToString();
     }
     #endregion
 
-    #region - Gameplay Menu -
+    #region - Placeable Information -
+
     /// <summary>
-    /// Activates and deactivates the menu canvas.
+    /// Displays the current placeable's sell price.
     /// </summary>
-    /// <param name="isActive"></param>
-    public void ToggleMenuCanvas(bool isActive)
+    private void DisplayPlaceableInfo()
     {
-        if (gameplayUIData == null)
-        {
-            print("null");
-        }
-        gameplayUIData.menuCanvas.SetActive(isActive);
+        int sellPrice = PlacementManager.Instance.GetSellPrice(activePlaceable);
+        gameplayUIData.placeableSellPrice.text = sellPrice + " gold";
     }
+
+    #endregion
+
+    #region - Gameplay Menu -
 
     /// <summary>
     /// Sets the specified menu panel to be the active panel and deactivates the other ones. Set to null to deactivate all menu panels.
     /// </summary>
     /// <param name="menuPanel">Menu panel to activate.</param>
-    public void ShowMenuPanel(GameObject menuPanel)
+    private void ShowMenuPanel(GameObject menuPanel)
     {
-        gameplayUIData.levelStart.SetActive(menuPanel == gameplayUIData.levelStart);
-        gameplayUIData.levelEnd.SetActive(menuPanel == gameplayUIData.levelEnd);
-        gameplayUIData.pauseMenu.SetActive(menuPanel == gameplayUIData.pauseMenu);
+        gameplayUIData.levelStartPanel.SetActive(menuPanel == gameplayUIData.levelStartPanel);
+        gameplayUIData.levelEndPanel.SetActive(menuPanel == gameplayUIData.levelEndPanel);
+        gameplayUIData.pauseMenuPanel.SetActive(menuPanel == gameplayUIData.pauseMenuPanel);
 
-        if (menuPanel != null && menuPanel != gameplayUIData.levelStart && menuPanel != gameplayUIData.levelEnd && menuPanel != gameplayUIData.pauseMenu)
+        if (menuPanel != null && menuPanel != gameplayUIData.levelStartPanel && menuPanel != gameplayUIData.levelEndPanel && menuPanel != gameplayUIData.pauseMenuPanel)
         {
-            throw new UnityException($"{menuPanel.name} isn't an element of Menu Canvas! Only menu panels can be passed as arguments to ShowMenupane method.");
+            throw new UnityException($"{menuPanel.name} isn't an element of Menu Canvas! Only menu panels can be passed as arguments to {nameof(ShowMenuPanel)} method.");
         }
     }
 
     // Traps were chosen and the actual game can start // TODO Implement a system for choosing traps/spells in a level
     private void OnTrapsChosen()
     {
-        ToggleMenuCanvas(false);
+        gameplayUIData.menuCanvas.SetActive(false);
         ShowMenuPanel(null);
-        ToggleCrosshair(true);
+        CrosshairSetActive(true);
+        ShowLevelStartMessage();
 
-        GameManager.Instance.TogglePause(false, false);
-    }
-
-    private void ResetGameplayUI()
-    {
-        UpdatePlayerStats();
-
-        // TODO until more traps and some spells are created and until the option of choosing what is to be used in a level is implemented
-        // ui manager slots are set up from here - simply using all the traps the player has
-        for (int i = 0; i < player.traps.Count; i++)
-        {
-            SetUpSlot(i, player.traps[i]);
-        }
-
-        ToggleMenuCanvas(true);
-        ShowMenuPanel(gameplayUIData.levelStart);
-        ToggleCrosshair(false);
-    }
-
-    private void SetUpGameplayMenuHandlers()
-    {
-        gameplayUIData.levelStartTestButton.onClick.AddListener(OnTrapsChosen);
-
-        gameplayUIData.continueButton.onClick.AddListener(() => GameManager.Instance.TogglePause(false, true));
-        //gameplayUIData.optionsButton.onClick.AddListener // TODO add options menu
-        gameplayUIData.goToMainMenuButton.onClick.AddListener(() =>
-        {
-            Time.timeScale = 1; // without this fade canvas won't allow changing of the scene
-            SceneLoader.Instance.LoadMainMenu();
-        });
+        LevelStarted?.Invoke();
+        GameManager.Instance.ChangePauseState(false, false);        
     }
 
     private void GoToNextLevel()
     {
-        string currentScene = SceneManager.GetActiveScene().name;
+        PrepareForSceneChange(true);
+
         // TODO From the data structure holding all the level scenes get the next one based on the current one and use SceneLoader to change scenes
+        string currentScene = SceneManager.GetActiveScene().name;
     }
 
     /// <summary>
-    /// Activates and deactivates pause menu panel in GameplayUI scene.
+    /// Activates and deactivates pause menu panel in GameplayUI scene. 
     /// </summary>
-    private void TogglePauseMenu(bool isGamePaused)
+    private void PauseMenuSetActive(bool isActive)
     {
-        ToggleMenuCanvas(isGamePaused);
-        ToggleCrosshair(!isGamePaused);
+        gameplayUIData.menuCanvas.SetActive(isActive);
+        CrosshairSetActive(!isActive);
 
-        if (isGamePaused)
+        if (isActive)
         {
-            ShowMenuPanel(gameplayUIData.pauseMenu);
+            ShowMenuPanel(gameplayUIData.pauseMenuPanel);
         }
         else
         {
@@ -331,8 +432,48 @@ public class UIManager : Raycaster
         }
     }
     #endregion
+
+    #region - Messaging system -
+    /// <summary>
+    /// Displayes the message in the messaging canvas for the specified time in seconds.
+    /// </summary>
+    /// <param name="message">Message to display.</param>
+    /// <param name="messageAliveTime">Amount of time in seconds to display the message.</param>
+    public void ShowMessage(string message, float messageAliveTime)
+    {
+        shouldShowMessage = true;
+        messageTimer = messageAliveTime;
+
+        gameplayUIData.message.text = message;
+        gameplayUIData.messagingCanvas.SetActive(true);
+    }
+
+    /// <summary>
+    /// Displays a countdown from the specified start seconds to zero, after which wave started message is shown.
+    /// </summary>
+    public void ShowCountdown(float countdownSeconds, bool isFinalWave = false)
+    {
+        if (countdownSeconds < 0)
+        {
+            print("Countdown from negative makes no sense. Check the caller.");
+            return;
+        }
+
+        this.isFinalWave = isFinalWave;
+
+        gameplayUIData.messagingCanvas.SetActive(true);
+        shouldShowCountdown = true;
+        countdownTimer = countdownSeconds;
+    }
+
+    private void ShowLevelStartMessage()
+    {
+        gameplayUIData.messagingCanvas.SetActive(true);
+        gameplayUIData.message.text = levelStartMessage;
+    }
     #endregion
-    
+
+    #endregion
 
     protected new void Awake()
     {
@@ -344,69 +485,270 @@ public class UIManager : Raycaster
     private void Start()
     {
         player = Player.Instance;
-        GameManager.Instance.PauseToggled += OnPauseToggled;
+        playerCamera = GameManager.Instance.playerCamera;
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        GameManager.PauseStateChanged += OnPauseChanged;
+        PlacementManager.PlacementModeChanged += OnPlacementModeChanged;
+        LevelManager.PlayerWon += () => OnGameEnd(true);
+        LevelManager.PlayerLost += () => OnGameEnd(false);
     }
 
     private void Update()
     {
-        if (shouldTogglePauseMenu && gameplayUIData != null)
+        CheckForGameplayPause();
+
+        if (shouldRaycastForInformation)
         {
-            shouldTogglePauseMenu = false;
-            TogglePauseMenu(GameManager.Instance.IsGamePaused);
+            RaycastForInformation();
+
+            if (activePlaceable != null)
+            {
+                CheckForPlaceableSell();
+            }
         }
 
-        print("Refactor this! Urgent!");
-        // Next lines should only be executed if the wave has started
+        // Range visual is only shown on right click
+        if (Input.GetMouseButton(1))
+        {
+            activePlaceable?.rangeVisual.SetActive(true);
+        }
+
+        CheckForCountdownMessage();
+        CheckForKeepMessageAlive();
+    }
+
+    /// <summary>
+    /// Checks for gameplay pause/unpause and shows/hides the pause menu accordingly.
+    /// </summary>
+    private void CheckForGameplayPause()
+    {
+        if (isPauseToggled && gameplayUIData != null)
+        {
+            isPauseToggled = false;
+            PauseMenuSetActive(GameManager.Instance.IsGamePaused);
+        }
+    }    
+
+    /// <summary>
+    /// Raycasts from the camera through the center of the viewport and if enemy or placeable were hit displays their information.
+    /// </summary>
+    private void RaycastForInformation()
+    {
         cameraRay = playerCamera.ViewportPointToRay(viewportCenter);
 
-        if (Physics.Raycast(cameraRay, out raycastHit, 25, raycastHitLayerMask)) // ADD TO CONST max distance?
+        // A LOT of "else if" checks are used so that no unnecessary canvas activation/deactivation happens with each frame
+        if (Physics.Raycast(cameraRay, out raycastHit, 25, raycastHitLayerMask)) // ADD TO CONST max distance
         {
             if (raycastHit.transform.CompareTag("Enemy")) // ADD TO CONST
             {
-                // Enemy was hit
-                if (activeEnemy == null)
-                {
-                    // There was no active enemy previously so enemy health canvas is activating now
-                    ToggleEnemyHealthCanvas(true);
-                }
-
-                activeEnemy = raycastHit.transform.GetComponent<Enemy>();
-
-                if (activeEnemy == null)
-                {
-                    throw new UnityException($"{raycastHit.transform.gameObject.name} game object is tagged as Enemy, but it has no Enemy script attached.");
-                }
-
-                if (activeEnemy.isDead)
-                {
-                    activeEnemy = null;
-                    ToggleEnemyHealthCanvas(false);
-                }
+                // Enemy is hit
+                ActivePlaceable = null;
+                UpdateActiveEnemy();
+            }
+            else if (raycastHit.transform.CompareTag("Placeable") || raycastHit.transform.CompareTag("Sellable")) // ADD TO CONST
+            {
+                // Placeable is hit
+                activeEnemy = null;
+                UpdateActivePlaceable();
             }
             else if (activeEnemy != null)
             {
-                // Something other than enemy was hit
+                // Something other than enemy or placeable is hit now, but last frame enemy was hit
                 activeEnemy = null;
-                ToggleEnemyHealthCanvas(false);
+                gameplayUIData.enemyCanvas.SetActive(false);
+            }
+            else if (activePlaceable != null)
+            {
+                // Something other than enemy or placeable is hit now, but last frame placeable was hit
+                ActivePlaceable = null;
+                gameplayUIData.placeableCanvas.SetActive(false);
             }
         }
         else if (activeEnemy != null)
         {
-            // Nothing from the hit layer mask was hit
+            // Nothing is hit now, but last frame enemy was hit
             activeEnemy = null;
-            ToggleEnemyHealthCanvas(false);
+            gameplayUIData.enemyCanvas.SetActive(false);
+        }
+        else if (activePlaceable != null)
+        {
+            // Nothing is hit now, but last frame placeable was hit
+            ActivePlaceable = null;
+            gameplayUIData.placeableCanvas.SetActive(false);
         }
 
         if (activeEnemy != null)
         {
-            UpdateEnemyInfo(activeEnemy);
+            UpdateEnemyInfo();
+        }
+        else if (activePlaceable != null)
+        {
+            DisplayPlaceableInfo();
         }
     }
 
-    private void OnPauseToggled()
+    /// <summary>
+    /// Finds and updates active enemy from the raycastHit object tagged as Enemy.
+    /// </summary>
+    private void UpdateActiveEnemy()
+    {        
+        if (activeEnemy == null)
+        {
+            // There was no active enemy previously so enemy health canvas is activating now
+            gameplayUIData.enemyCanvas.SetActive(true);
+            gameplayUIData.placeableCanvas.SetActive(false);
+        }
+
+        activeEnemy = raycastHit.transform.GetComponent<Enemy>();
+
+        if (activeEnemy == null)
+        {
+            throw new UnityException($"{raycastHit.transform.gameObject.name} game object is tagged as Enemy, but it has no Enemy script attached.");
+        }
+
+        // In case the enemy is dead but the object is still in the scene
+        if (activeEnemy.IsDead)
+        {
+            activeEnemy = null;
+            gameplayUIData.enemyCanvas.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// Finds and updates active placeable from the raycastHit object tagged as Placeable.
+    /// </summary>
+    private void UpdateActivePlaceable()
     {
-        shouldTogglePauseMenu = true;
-    }           
+        if (activePlaceable == null)
+        {
+            // There was no active placeable previously so placeable canvas is activating now
+            gameplayUIData.enemyCanvas.SetActive(false);
+            gameplayUIData.placeableCanvas.SetActive(true);
+        }
+
+        ActivePlaceable = raycastHit.transform.GetComponent<Placeable>();        
+    }
+
+    /// <summary>
+    /// If 'E' was pressed reports that the active placeable should be sold.
+    /// </summary>
+    private void CheckForPlaceableSell()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            PlacementManager.Instance.SellPlaceable(activePlaceable);            
+
+            gameplayUIData.placeableCanvas.SetActive(false);
+            ActivePlaceable = null;
+        }
+    }
+
+    /// <summary>
+    /// If flagged as needed displays the countdown to 0, in whole numbers, and then shows the wave started message for a while.
+    /// </summary>
+    private void CheckForCountdownMessage()
+    {
+        // Until the countdown reaches 0 decrease it and display whole numbers
+        if (shouldShowCountdown && countdownTimer >= 0)
+        {
+            countdownWholeNumber = Mathf.Ceil(countdownTimer);
+            if (gameplayUIData.message.text != countdownWholeNumber.ToString())
+            {
+                gameplayUIData.message.text = countdownWholeNumber.ToString();
+            }
+
+            if (countdownTimer == 0)
+            {
+                shouldShowCountdown = false;
+
+                ShowMessage(isFinalWave ? finalWaveMessage : waveStartedMessage, defaultMessageAliveTime);
+            }
+
+            countdownTimer -= Time.deltaTime;
+            if (countdownTimer < 0)
+            {
+                countdownTimer = 0;
+            }
+        }
+    }
+
+    /// <summary>
+    /// If a message is displayed this method will keep it visible until the messageTimer reaches zero (it's being decreased every frame).
+    /// </summary>
+    private void CheckForKeepMessageAlive()
+    {
+        if (shouldShowMessage && messageTimer > 0)
+        {
+            messageTimer -= Time.deltaTime;
+
+            if (messageTimer <= 0)
+            {
+                shouldShowMessage = false;
+                gameplayUIData.messagingCanvas.SetActive(false);
+            }
+        }
+    }
+
+    private void OnSceneLoaded(Scene loadedScene, LoadSceneMode loadSceneMode)
+    {
+        if (loadedScene.name == "MainMenu") // ADD TO CONST
+        {
+            // GameplayUIData holds only nulls, because GameplayUI scene was removed. 
+            // IsReadyToReceiveUpdates property needs to return false and that is assured by setting gameplayUIData to null
+            gameplayUIData = null;
+        }
+    }
+
+    /// <summary>
+    /// Signals that pause/unpause was registered in game manager.
+    /// </summary>
+    private void OnPauseChanged()
+    {
+        isPauseToggled = true;
+    }
+
+    private void OnPlacementModeChanged(bool isInPlacementMode)
+    {
+        shouldRaycastForInformation = !isInPlacementMode;
+
+        if (isInPlacementMode)
+        {
+            activeEnemy = null;
+            ActivePlaceable = null;
+            gameplayUIData.enemyCanvas.SetActive(false);
+            gameplayUIData.placeableCanvas.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// Displays appropriate screen for the player depending on whether he won or lost the game.
+    /// </summary>
+    private void OnGameEnd(bool hasPlayerWon)
+    {
+        PrepareForSceneChange(false);
+
+        CrosshairSetActive(false);
+
+        gameplayUIData.enemyCanvas.SetActive(false);
+        gameplayUIData.placeableCanvas.SetActive(false);
+        gameplayUIData.messagingCanvas.SetActive(false);
+
+        gameplayUIData.winText.SetActive(hasPlayerWon);
+        gameplayUIData.loseText.SetActive(!hasPlayerWon);
+
+        ShowMenuPanel(gameplayUIData.levelEndPanel);
+        gameplayUIData.menuCanvas.SetActive(true);
+
+        if (hasPlayerWon)
+        {
+            //gameplayUIData.levelEndGoToNextLevel.interactable = true;
+        }
+        else
+        {
+            gameplayUIData.levelEndGoToNextLevel.interactable = false;
+        }
+    }
 }
 
 [System.Serializable]
@@ -440,7 +782,7 @@ public class Slot
                 goldCost.text = string.Empty;
             }
 
-            selectionHighlight.SetActive(false);
+            //selectionHighlight.SetActive(false);
         }
     }
 
