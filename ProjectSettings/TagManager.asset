@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - AttackArea
   - UIManager
+  - Sellable
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - 
   - Environment
   - Enemy
-  - Trap
+  - Placeable
   - Player
   - AttackArea
   - 

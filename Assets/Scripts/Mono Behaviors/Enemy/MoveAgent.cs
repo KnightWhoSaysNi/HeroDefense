@@ -6,9 +6,9 @@ using UnityEngine.AI;
 // TODO If there is no blocking feature refactor this class so it doesn't use a NavMeshAgent at all, 
 // but some kind of a waypoint system, which should increase performanse and FPS
 [RequireComponent(typeof(NavMeshAgent))]
-public class MoveAgent : MonoBehaviour 
+public class MoveAgent : MonoBehaviour  // TODO Refactor
 {
-    public NavMeshAgent agent;
+    public NavMeshAgent agent; 
     private Transform followTargetTransform;
     private Vector3 targetPosition;
     private Vector3 followTargetOffset;
@@ -22,11 +22,6 @@ public class MoveAgent : MonoBehaviour
             return agent.remainingDistance;
         }
     }
-
-    //public void StopAgent()
-    //{
-    //    agent.isStopped = true;
-    //}
 
     /// <summary>
     /// A one time action of setting the destination for the NavMeshAgent to the specified vector3.
@@ -71,7 +66,6 @@ public class MoveAgent : MonoBehaviour
 
     private void Awake()
     {
-        agent = GetComponent<NavMeshAgent>();
         zeroVector = Vector3.zero;
     }
 

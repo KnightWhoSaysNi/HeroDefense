@@ -5,26 +5,49 @@ using UnityEngine;
 [RequireComponent(typeof(Renderer))]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(MoveAgent))]
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour // Refactor
 {
+    public EnemyType enemyType;
+    
     public EnemyData enemyData;
-    [HideInInspector] public MoveAgent moveAgent;
+    [HideInInspector]
+    public MoveAgent moveAgent;
 
+    public Renderer[] otherRenderers;
+    public ParticleSystem dieParticleEffect;
     public Material hitMaterial;
     protected new Renderer renderer;
     protected Material originalMaterial;
 
-     public EnemyState state;       // TODO hide in inspector
-     public bool isDead;            // TODO hide in inspector
-     public float currentHealth;    // TODO hide in inspector
-    protected Coroutine updateStateCoroutine; // TODO delete this if it's not being called in StopCoroutine
-    protected WaitForSeconds minWaitInAttackedState;
-    protected bool isHit; 
+    protected EnemyState state;       
+    [Range(0, 10)]
+    [SerializeField]
+    protected float minTimeInAttackedState = 0.1f;
+    private float hitTimer = -1;
+    private float deathTimer = -1;
+    protected float currentHealth;    
+    protected bool isHit;
+    protected bool isDead;
 
     private new Collider collider;
+       
+    public delegate void EnemyDiedHandler(Enemy enemy, Collider collider, bool hasFinishedLevel);
+    public static event EnemyDiedHandler EnemyDied;
 
-    public static event System.Action<Enemy, Collider> EnemyDied;
-
+    public bool IsDead
+    {
+        get
+        {
+            return isDead;
+        }
+    }
+    public float CurrentHealth
+    {
+        get
+        {
+            return currentHealth;
+        }
+    }
     public float MaxHealth
     {
         get
@@ -32,12 +55,39 @@ public class Enemy : MonoBehaviour
             return enemyData.maxHealth;
         }
     }
-
     public int Armor
     {
         get
         {
             return enemyData.armor;
+        }
+    }
+    public int GoldReward
+    {
+        get
+        {
+            return enemyData.goldReward;
+        }
+    }
+    public int Level
+    {
+        get
+        {
+            return enemyData.level;
+        }
+    }
+    public int BaseExperienceReward
+    {
+        get
+        {
+            return enemyData.baseExperienceReward;
+        }
+    }
+    public int EnergyDrain
+    {
+        get
+        {
+            return enemyData.energyDrain;
         }
     }
 
@@ -47,28 +97,91 @@ public class Enemy : MonoBehaviour
     public virtual void RegisterAttack(float damage, DamageType damageType) 
     {
         isHit = true;
-
-        if (state == EnemyState.NormalState)
-        {
-            // Enemy isn't in attacked state at the moment, so either there were no recent attackers
-            // or the current attacker's attack cooldown is greater than the minWaitInAttackedState time            
-            updateStateCoroutine = StartCoroutine(UpdateState());
-        }       
-
         TakeDamage(damage, damageType);
     }
 
-    protected virtual void Awake()
+    public virtual void Die(bool hasFinishedLevel = false)
     {
+        isDead = true;
+
+        if (hasFinishedLevel)
+        {
+            deathTimer = 0;
+            EnemyDied?.Invoke(this, collider, true);
+        }
+        else
+        {
+            // Enemy died
+            UpdateRenderers();
+            dieParticleEffect.Play();
+            EnemyDied?.Invoke(this, collider, false);
+        }
+    }    
+        
+    protected virtual void Awake()
+    {        
         state = EnemyState.NormalState;        
         moveAgent = GetComponent<MoveAgent>();
 
         renderer = GetComponent<Renderer>();
         originalMaterial = renderer.sharedMaterial;
-        minWaitInAttackedState = new WaitForSeconds(0.1f); // ADD TO CONST 
 
         currentHealth = enemyData.maxHealth;
         collider = GetComponent<Collider>();
+
+        // TODO Change this if there is a death animation, not just the particle effect
+        deathTimer = dieParticleEffect.main.duration;
+    }
+
+    protected virtual void Start()
+    {
+        moveAgent.agent.speed = enemyData.movementSpeed;
+    }
+
+    protected virtual void Update()
+    {
+        if (!isDead)
+        {
+            UpdateState();
+        }
+
+        if (isDead && deathTimer >= 0)
+        {            
+            deathTimer -= Time.deltaTime;
+
+            if (deathTimer <= 0)
+            {
+                // Return to the pool
+                EnemyPool.Instance.ReclaimObject(enemyType, this);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Checks if the enemy was hit. Goes into attacked state for <see cref="minTimeInAttackedState"/> seconds, after which it returns to
+    /// the normal state, unless it was hit again during those <see cref="minTimeInAttackedState"/> seconds.
+    /// </summary>
+    protected virtual void UpdateState()
+    {
+        if (isHit)
+        {
+            isHit = false;
+            hitTimer = minTimeInAttackedState;
+        }
+
+        if (hitTimer >= 0)
+        {
+            if (state != EnemyState.AttackedState)
+            {
+                GoToAttackedState();
+            }
+
+            hitTimer -= Time.deltaTime;
+        }
+        else if (state != EnemyState.NormalState)
+        {
+            GoToNormalState();
+        }
     }
 
     /// <summary>
@@ -81,64 +194,49 @@ public class Enemy : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            //print(currentHealth);
             Die();
         }
     }
 
-    public bool instantDeath;
-    private void Update()
-    {
-        if (instantDeath)
-        {
-            instantDeath = false;
-            TakeDamage(1000, DamageType.Normal);
-        }
-    }
-
-    protected virtual void Die()
-    {
-        isDead = true;
-        
-        EnemyDied?.Invoke(this, collider);
-        // TODO Play death animation 
-        
-        Destroy(this.gameObject, 0.5f); // ADD TO CONST TODO Check if adding a delay time for the destroy will give traps enough time to adjust to the death
-    }
-
     /// <summary>
-    /// Changes state based on whether or not the enemy is hit
+    /// Resets enemy so that it is ready for use next time someone calls him from the pool.
     /// </summary>
-    /// <returns></returns>
-    protected virtual IEnumerator UpdateState()
+    protected virtual void OnDisable()
     {
-        while (isHit)
+        if (state != EnemyState.NormalState)
         {
-            // Enemy was hit since last iteration so it goes into attacked state and stays in it for minWaitInAttackedState.
-            // isHit is set to false to stop an infinite cycle, but during the minWaitInAttackedState this variable can be set to 
-            // true outside of this coroutine if the enemy is attacked again
-            isHit = false;
-            if (state != EnemyState.AttackedState)
-            {
-                GoToAttackedState();
-            }
-            yield return minWaitInAttackedState;
+            GoToNormalState();
         }
 
-        // Not being attacked at this moment so go back to normal state
-        GoToNormalState();        
+        isDead = false;
+        isHit = false;
+        currentHealth = enemyData.maxHealth;
+        hitTimer = -1;
+        deathTimer = dieParticleEffect.main.duration;
+
+        UpdateRenderers();
     }
 
+    protected virtual void UpdateRenderers()
+    {
+        renderer.enabled = !isDead;
+        for (int i = 0; i < otherRenderers.Length; i++)
+        {
+            otherRenderers[i].enabled = !isDead;
+        }
+    }
 
     protected virtual void GoToAttackedState()
     {
         state = EnemyState.AttackedState;
+        moveAgent.agent.speed = enemyData.movementSpeed * 0.75f; // TEST
         renderer.material = hitMaterial;
     }
 
     protected virtual void GoToNormalState()
     {
         state = EnemyState.NormalState;
+        moveAgent.agent.speed = enemyData.movementSpeed;
         renderer.material = originalMaterial;
     }
 }
