@@ -9,10 +9,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 583f9cdb5e9a4df4c807d5f4b7ecf6a6, type: 3}
-  m_Name: LargeLevel
+  m_Name: Test
   m_EditorClassIdentifier: 
   levelElements:
-  - wave: {fileID: 11400000, guid: f7f71e957e6a95d489cd4828112e1909, type: 2}
+  - wave: {fileID: 11400000, guid: 46695b159d41c60468693a1e5a0b55fb, type: 2}
     waveCount: 1
-  - wave: {fileID: 11400000, guid: 422bbf23cf117fb4682c54b3400b215f, type: 2}
+  - wave: {fileID: 11400000, guid: a77e75e8c2ddfbb4391b600c56f7e8a6, type: 2}
     waveCount: 1
+  - wave: {fileID: 11400000, guid: cc1ac3592472c04449c99648fead18fe, type: 2}
+    waveCount: 1
+  - wave: {fileID: 11400000, guid: 32da4e08fb0490a4d87eff3be50767ee, type: 2}
+    waveCount: 1
+  startEnergy: 1
+  startGold: 0

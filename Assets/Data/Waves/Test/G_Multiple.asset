@@ -9,15 +9,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41fec79ee8d60014bbc90823961232ef, type: 3}
-  m_Name: Wave 4
+  m_Name: G_Multiple
   m_EditorClassIdentifier: 
   startDelay: 0
   endDelay: 0
   shouldRandomizeEnemies: 0
   spawnRate: 0
   waveElements:
-  - enemy: {fileID: 114503007417218412, guid: 806d5b9165719b64f91a24f7464e9f66, type: 2}
-    minNumberOfEnemies: 1
-    maxNumberOfEnemies: 1
+  - enemy: {fileID: 114970115917398916, guid: a70d7498fe25911438cc287c14f07888, type: 2}
+    minNumberOfEnemies: 50
+    maxNumberOfEnemies: 50
     chanceOfAppearing: 1
-    delayBeforeSpawning: 0
+    additionalSpawnDelay: 0.5
