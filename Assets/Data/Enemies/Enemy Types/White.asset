@@ -8,12 +8,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdea55109b42e7d49a91441572ec9c16, type: 3}
-  m_Name: StrongEnemy 1
+  m_Script: {fileID: 11500000, guid: 10f13ba52957e3e43abaa0d18e603e90, type: 3}
+  m_Name: White
   m_EditorClassIdentifier: 
-  enemyPrefab: {fileID: 0}
-  maxHealth: 200
-  currentHealth: 200
-  movementSpeed: 5
-  energyDrain: 0
-  armor: 15
