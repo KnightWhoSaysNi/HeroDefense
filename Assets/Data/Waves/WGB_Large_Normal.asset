@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41fec79ee8d60014bbc90823961232ef, type: 3}
+  m_Name: WGB_Large_Normal
+  m_EditorClassIdentifier: 
+  startDelay: 20
+  endDelay: 5
+  shouldRandomizeEnemies: 0
+  spawnRate: 0
+  waveElements:
+  - enemy: {fileID: 114503007417218412, guid: 806d5b9165719b64f91a24f7464e9f66, type: 2}
+    minNumberOfEnemies: 4
+    maxNumberOfEnemies: 10
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 0
+  - enemy: {fileID: 114970115917398916, guid: a70d7498fe25911438cc287c14f07888, type: 2}
+    minNumberOfEnemies: 5
+    maxNumberOfEnemies: 20
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 0
+  - enemy: {fileID: 114503007417218412, guid: f6daf9ed435cefb4882d58b0161e1c42, type: 2}
+    minNumberOfEnemies: 2
+    maxNumberOfEnemies: 2
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 3
+  - enemy: {fileID: 114503007417218412, guid: f6daf9ed435cefb4882d58b0161e1c42, type: 2}
+    minNumberOfEnemies: 10
+    maxNumberOfEnemies: 20
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 0
+  - enemy: {fileID: 114970115917398916, guid: a70d7498fe25911438cc287c14f07888, type: 2}
+    minNumberOfEnemies: 5
+    maxNumberOfEnemies: 10
+    chanceOfAppearing: 0.5
+    additionalSpawnDelay: 0.55
+  - enemy: {fileID: 114503007417218412, guid: 806d5b9165719b64f91a24f7464e9f66, type: 2}
+    minNumberOfEnemies: 5
+    maxNumberOfEnemies: 10
+    chanceOfAppearing: 0.5
+    additionalSpawnDelay: 0.55
+  - enemy: {fileID: 114503007417218412, guid: f6daf9ed435cefb4882d58b0161e1c42, type: 2}
+    minNumberOfEnemies: 5
+    maxNumberOfEnemies: 10
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 0
+  - enemy: {fileID: 114970115917398916, guid: a70d7498fe25911438cc287c14f07888, type: 2}
+    minNumberOfEnemies: 2
+    maxNumberOfEnemies: 7
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 1
+  - enemy: {fileID: 114503007417218412, guid: f6daf9ed435cefb4882d58b0161e1c42, type: 2}
+    minNumberOfEnemies: 11
+    maxNumberOfEnemies: 20
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 0.2
+  - enemy: {fileID: 114503007417218412, guid: f6daf9ed435cefb4882d58b0161e1c42, type: 2}
+    minNumberOfEnemies: 2
+    maxNumberOfEnemies: 2
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 3
+  - enemy: {fileID: 114503007417218412, guid: 806d5b9165719b64f91a24f7464e9f66, type: 2}
+    minNumberOfEnemies: 2
+    maxNumberOfEnemies: 4
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 1.2
+  - enemy: {fileID: 114970115917398916, guid: a70d7498fe25911438cc287c14f07888, type: 2}
+    minNumberOfEnemies: 7
+    maxNumberOfEnemies: 15
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 1
+  - enemy: {fileID: 114970115917398916, guid: f49a38cb3709d8547a6cf5af8d7b500c, type: 2}
+    minNumberOfEnemies: 1
+    maxNumberOfEnemies: 1
+    chanceOfAppearing: 0.35
+    additionalSpawnDelay: 2
+  - enemy: {fileID: 114503007417218412, guid: f6daf9ed435cefb4882d58b0161e1c42, type: 2}
+    minNumberOfEnemies: 8
+    maxNumberOfEnemies: 8
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 0
+  - enemy: {fileID: 114503007417218412, guid: 806d5b9165719b64f91a24f7464e9f66, type: 2}
+    minNumberOfEnemies: 5
+    maxNumberOfEnemies: 10
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 0.7

@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 93719c8af4247e44fb69cddec864d3c5
+timeCreated: 1506170874
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Sedgwick Ave
+  fontNames:
+  - Sedgwick Ave
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

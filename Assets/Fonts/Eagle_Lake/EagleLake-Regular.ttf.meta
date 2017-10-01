@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: bb251728046129142947b3c1a2314a72
+timeCreated: 1506170874
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Eagle Lake
+  fontNames:
+  - Eagle Lake
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

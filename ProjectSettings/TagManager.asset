@@ -3,7 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Placeable
+  - Enemy
+  - AttackArea
+  - UIManager
+  - Sellable
   layers:
   - Default
   - TransparentFX
@@ -13,11 +18,11 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Environment
+  - Enemy
+  - Placeable
+  - Player
+  - AttackArea
   - 
   - 
   - 
