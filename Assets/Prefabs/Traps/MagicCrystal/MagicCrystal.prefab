@@ -510,7 +510,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   placeableType: {fileID: 11400000, guid: d4d08d15c634e9d46b9c1a572b849ad1, type: 2}
   rangeVisual: {fileID: 1267285692102170}
-  goldCost: 200
+  goldCost: 250
   placementOffsetMultiplier: 0
   renderers:
   - {fileID: 23742623812223686}

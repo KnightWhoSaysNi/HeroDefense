@@ -13,11 +13,15 @@ public class LevelEditor : Editor
     private readonly string levelElementsPropertyName = nameof(Level.levelElements);
     private readonly string wavePropertyName = nameof(LevelElement.wave);
     private readonly string waveCountPropertyName = nameof(LevelElement.waveCount);
+    private readonly string startEnergyPropertyName = nameof(Level.startEnergy);
+    private readonly string startGoldPropertyName = nameof(Level.startGold);
 
     private Level level;
     private SerializedProperty levelElementsProperty;
     private SerializedProperty waveProperty;
     private SerializedProperty waveCountProperty;
+    private SerializedProperty startEnergyProperty;
+    private SerializedProperty startGoldProperty;
     private ReorderableList reorderableList;
     private int indexOfElementToDelete = -1;
 
@@ -48,6 +52,8 @@ public class LevelEditor : Editor
         EditorGUILayout.Space();
 
         DrawLevelValidityInfo();
+        DrawStartEnergyProperty();
+        DrawStartGoldProperty();
 
         if (indexOfElementToDelete != -1)
         {
@@ -81,6 +87,10 @@ public class LevelEditor : Editor
 
         // Reorderable list of level elements
         InitializeReorderableList();
+
+        // Energy and start gold
+        startEnergyProperty = serializedObject.FindProperty(startEnergyPropertyName);
+        startGoldProperty = serializedObject.FindProperty(startGoldPropertyName);
     }
     
     #region - Level elements related methods -
@@ -256,7 +266,7 @@ public class LevelEditor : Editor
     private void DrawLevelValidityInfo()
     {
         bool isLevelValid = EditorHelper.IsLevelValid(level);
-
+        
         Rect rect = EditorGUILayout.BeginHorizontal();
 
         // Validation circles
@@ -274,8 +284,49 @@ public class LevelEditor : Editor
             EditorGUI.LabelField(labelRect, new GUIContent("Level cannot be used in play mode", "Not all of its waves are valid"));
         }
 
+        EditorGUILayout.EndHorizontal(); 
+    }
 
-        EditorGUILayout.EndHorizontal();        
+    /// <summary>
+    /// Draws int field with a label for the start energy property.
+    /// </summary>
+    private void DrawStartEnergyProperty()
+    {
+        GUILayout.Space(40);
+
+        Rect rect = EditorGUILayout.BeginHorizontal();
+
+        // Label
+        Rect labelRect = new Rect(rect.x, rect.y, rect.width * 0.75f, EditorGUIUtility.singleLineHeight);
+        EditorGUI.LabelField(labelRect, "Start energy for this level:");
+
+        // Start energy value
+        Rect energyRect = new Rect(labelRect.xMax, labelRect.y, rect.width * 0.25f, EditorGUIUtility.singleLineHeight);
+        startEnergyProperty.intValue = EditorGUI.IntField(energyRect, startEnergyProperty.intValue);
+        startEnergyProperty.intValue = Mathf.Clamp(startEnergyProperty.intValue, 1, 10000); // ADD TO CONST 
+
+        EditorGUILayout.EndHorizontal();
+    }
+
+    /// <summary>
+    /// Draws int field for the start gold property.
+    /// </summary>
+    private void DrawStartGoldProperty()
+    {
+        GUILayout.Space(EditorGUIUtility.singleLineHeight * 1.5f);
+
+        Rect rect = EditorGUILayout.BeginHorizontal();
+
+        // Label
+        Rect labelRect = new Rect(rect.x, rect.y, rect.width * 0.75f, EditorGUIUtility.singleLineHeight);
+        EditorGUI.LabelField(labelRect, "Start gold for this level:");
+
+        // Start gold value
+        Rect startGoldRect = new Rect(labelRect.xMax, labelRect.y, rect.width * 0.25f, EditorGUIUtility.singleLineHeight);
+        startGoldProperty.intValue = EditorGUI.IntField(startGoldRect, startGoldProperty.intValue);
+        startGoldProperty.intValue = Mathf.Clamp(startGoldProperty.intValue, 0, 10000); // ADD TO CONST 
+
+        EditorGUILayout.EndHorizontal();
     }
     #endregion
 }
