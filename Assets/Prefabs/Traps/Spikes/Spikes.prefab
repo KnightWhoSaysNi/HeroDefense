@@ -47,6 +47,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1348593198221596
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4473833464829444}
+  - component: {fileID: 33662201678161110}
+  - component: {fileID: 23667697928863112}
+  m_Layer: 12
+  m_Name: AttackAreaRange
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1524795714035454
 GameObject:
   m_ObjectHideFlags: 0
@@ -108,7 +125,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 4473833464829444}
   m_Father: {fileID: 4425165235531788}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -145,7 +163,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1277460829683414}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.2648869, y: 1.4699997, z: -73.40699}
+  m_LocalPosition: {x: -3.01, y: 0, z: -7.21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4388022004654364}
@@ -153,6 +171,19 @@ Transform:
   - {fileID: 4593088005870564}
   - {fileID: 4155105281762066}
   m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4473833464829444
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1348593198221596}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.76, z: 0}
+  m_LocalScale: {x: 3, y: 2.7, z: 3}
+  m_Children: []
+  m_Father: {fileID: 4155105281762066}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4593088005870564
@@ -168,6 +199,38 @@ Transform:
   m_Father: {fileID: 4425165235531788}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &23667697928863112
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1348593198221596}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 2100000, guid: 91292502b6de3454e84c8614e9796291, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
 --- !u!23 &23718549843970988
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -285,6 +348,13 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1312757636772638}
   m_Mesh: {fileID: 4300006, guid: c44faf00891b684448044f98b5a0efae, type: 3}
+--- !u!33 &33662201678161110
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1348593198221596}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!54 &54266065441321702
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -381,8 +451,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9d4bea64a445d246810642340a572ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  position: {x: 0, y: 0, z: 0}
-  placementOffsetMutiplier: 0
+  placeableType: {fileID: 11400000, guid: 0d41c5cad355687479de7738903f9743, type: 2}
+  rangeVisual: {fileID: 1348593198221596}
+  goldCost: 100
+  placementOffsetMultiplier: 0
   renderers:
   - {fileID: 23953601883229844}
   - {fileID: 23862605796001156}
@@ -393,7 +465,6 @@ MonoBehaviour:
   - {fileID: 2100000, guid: c834ad8873272f14dbba648a29264e5c, type: 2}
   illegalPlacementMaterial: {fileID: 2100000, guid: ed5a61447e3c58144999563dda4f95ba,
     type: 2}
-  isPlaced: 0
   currentlyCollidedObjects: []
   thumbnail: {fileID: 21300000, guid: c0bf1cafc2efc034292db969d831cafa, type: 3}
   trapData: {fileID: 11400000, guid: 8e5247881f759a4459cea683b1c21d2f, type: 2}
