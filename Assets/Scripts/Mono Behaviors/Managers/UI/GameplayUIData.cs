@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [System.Serializable]
-public class GameplayUIData : UIData
+public class GameplayUIData : InspectorData
 {
     [Header("Player Stats")]
     public Text playerLevel;
@@ -22,25 +22,44 @@ public class GameplayUIData : UIData
     [Space(3)]
     public Slot[] slots;
 
-    [Header("Enemy Health")]
-    public GameObject enemyHealthCanvas;
+    [Header("Enemy Information")]
+    public GameObject enemyCanvas;
     [Space(3)]
     public Text enemyHealth;
     public Text enemyArmor;
     public Slider enemyHealthBar;
 
+    [Header("Placeable Information")]
+    public GameObject placeableCanvas;
+    [Space(3)]
+    public Text placeableSellPrice;
+
     [Header("Gameplay Menu")]
     public GameObject menuCanvas;
+    public GraphicRaycaster menuGraphicRaycaster;
+
+    [Header("Level Start")]
+    public GameObject levelStartPanel;
     [Space(3)]
-    public GameObject levelStart;
-    public GameObject levelEnd;
-    public GameObject pauseMenu;
-    [Space(5)]
-    public Button levelStartTestButton;
+    public Button levelStartTest;
+    
+    [Header("Level End")]
+    public GameObject levelEndPanel;
     [Space(3)]
-    public Button continueButton;
-    public Button optionsButton;
-    public Button goToMainMenuButton;
+    public GameObject loseText;
+    public GameObject winText;
+    public Button levelEndGoToMainMenu;
+    public Button levelEndRestart;
+    public Button levelEndGoToNextLevel;
+
+    [Header("Pause Menu")]
+    public GameObject pauseMenuPanel;
+    [Space(3)]
+    public Button pauseContinue;
+    public Button pauseRestart;
+    public Button pauseOptions;
+    public Button pauseGoToMainMenu;
+    public Button pauseQuit;
 
     [Header("Message Display")]
     public GameObject messagingCanvas;

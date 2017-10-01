@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Base class for classes holding UI elements for different UI helper classes that talk to the UIManager.
+/// Base class for helper classes holding objects set in the inspector.
 /// </summary>
-public abstract class UIData
+public abstract class InspectorData
 {
     public bool AreAllElementsSet()
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [System.Serializable]
-public class MainMenuUIData : UIData
+public class MainMenuUIData : InspectorData
 {
     [Header("Main Menu")]
     public GameObject mainMenu;

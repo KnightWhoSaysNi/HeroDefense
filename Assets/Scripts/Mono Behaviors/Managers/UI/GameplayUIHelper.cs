@@ -9,7 +9,7 @@ public class GameplayUIHelper : MonoBehaviour
     public GameplayUIData gameplayUIData;
 
     private void Awake()
-    {
+    {        
         if (!gameplayUIData.AreAllElementsSet())
         {
             throw new UnityException($"{typeof(GameplayUIHelper)} class doesn't have all of its fields set up.");
