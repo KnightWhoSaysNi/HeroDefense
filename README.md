@@ -18,5 +18,4 @@ Gameplay
 Code specific
 * Player movement script - which will replace the standard assets' First Person Controller
 * WaveData and spawning system rework, so that a designer has more control over how the waves are created and how the level plays out
-* Pooling system: implementation of IPoolable
 * Trap refactor: derived class for each targeting system
