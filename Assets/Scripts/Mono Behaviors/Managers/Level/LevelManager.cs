@@ -340,9 +340,7 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
     /// </summary>
     private void SpawnEnemy(Enemy enemy)
     {
-        Enemy spawnedEnemy = EnemyPool.Instance.GetObject(enemy.enemyType, levelData.enemyParent);        
-        spawnedEnemy.moveAgent.SetTarget(levelData.endPoint.position);        
-        
+        Enemy spawnedEnemy = EnemyPool.Instance.GetObject(enemy.enemyType, levelData.enemyParent, null, levelData.endPoint.position);     
         numberOfAliveEnemies++;
     }
 

@@ -6,6 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class Trap : Placeable // TODO make this class an abstract class and create a separate derived class for each targeting system
 {
+    #region - Fields -
     // TODO Set all fields that don't need to be public to [SerializeField] protected/private
     [Space(10)]
     public Sprite thumbnail;
@@ -15,7 +16,8 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     [Tooltip("Time it takes for the attack to connect with the target enemy after the trap has fired. " +
         "This should be a very small value so the enemy doesn't leave the attack area by the time it gets hit." +
         "This should sync with the attack animation.")]
-    [Range(0,1)] public float attackHitDelay;
+    [Range(0, 1)]
+    public float attackHitDelay;
     protected TrapState state;
     protected WaitForSeconds attackCooldown;
     protected WaitForSeconds waitAttackHitDelay;
@@ -40,9 +42,11 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     protected Enemy currentEnemy;
     protected Coroutine attackCoroutine;
     protected bool isObstructed;
-        
-    protected Animator animator;
 
+    protected Animator animator;
+    #endregion
+
+    #region - Properties -
     public int Cost
     {
         get
@@ -50,8 +54,10 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
             return goldCost;
         }
     }
+    #endregion
 
-    protected new void Awake() // TODO check if this needs to be in Awake instead
+    #region - MonoBehavior methods -
+    protected new void Awake()
     {
         base.Awake();
 
@@ -62,7 +68,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
         aoeColliders = new Collider[trapData.hitAllTargetsInRange ? 300 : trapData.maxNumberOfTargets]; // ADD TO CONST 300 is arbitrary number used for testing
         attackCooldown = new WaitForSeconds(trapData.attackCooldown);
         waitAttackHitDelay = new WaitForSeconds(attackHitDelay);
-        
+
         trapAttackArea.EnemyMovementRegistered += OnEnemyMovementRegistered;
 
         animator = GetComponent<Animator>();
@@ -70,11 +76,13 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
 
     protected override void OnDisable()
     {
-        base.OnDisable();        
+        base.OnDisable();
         enemiesInRange.Clear();
         currentEnemy = null;
     }
+    #endregion    
 
+    #region - Placeable override methods -
     protected override void OnPlaced()
     {
         base.OnPlaced();
@@ -86,7 +94,9 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
         base.OnSold();
         GoToNormalState();
     }
+    #endregion
 
+    #region - Protected and private methods -
     /// <summary>
     /// If the specified enemy has entered the attack area it is added to the list of enemies in range to be attacked when possible.
     /// If the specified enemy has left the attack area it is removed from the list of enemies in range so it cannot be attacked.
@@ -108,7 +118,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
                 {
                     // There were no enemies in range before adding this one, so start the attack sequence. Otherwise the attack is already running
                     attackCoroutine = StartCoroutine(Attack());
-                }                
+                }
             }
         }
         else
@@ -119,7 +129,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
             if (currentEnemy == enemy)
             {
                 StartCoroutine(UpdateCurrentEnemy());
-            }            
+            }
         }
     }
 
@@ -127,7 +137,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     /// Attacks enemies while there are enemies in range to attack. Goes from attack state to normal state based on the trap data.
     /// </summary>
     protected virtual IEnumerator Attack() // TODO REFACTOR !!!
-    {        
+    {
         while (isWaitingForCooldown)
         {
             yield return null;
@@ -148,7 +158,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
                 CheckIfObstructed();
 
                 // It's set up this way so that the attack coroutine doesn't lose a frame if there is no obstruction
-                while (isObstructed) 
+                while (isObstructed)
                 {
                     yield return null;
                     CheckIfObstructed();
@@ -179,9 +189,9 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
                         // Current enemy (and all others in range) died during the attack hit delay. State and cooldown resolved in StopAttackCoroutine()
                         yield break;
                     }
-                }                
+                }
             }
-           
+
             AttackEnemies();
 
             if (currentEnemy == null)
@@ -198,7 +208,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
             else
             {
                 GoToNormalState();
-                
+
                 isWaitingForCooldown = true;
                 yield return attackCooldown;
                 isWaitingForCooldown = false;
@@ -245,11 +255,11 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     /// Attacks the current enemy and if the targeting system is not 'single target' it attacks all other valid targets as well.
     /// </summary>
     protected virtual void AttackEnemies()
-    {  
+    {
         switch (trapData.targetingSystem)
         {
             case TargetingSystem.SingleTarget:
-                AttackSingleEnemy(currentEnemy, trapData.damage);                
+                AttackSingleEnemy(currentEnemy, trapData.damage);
                 break;
             case TargetingSystem.MultipleTargets:
                 UpdateEnemiesInRange();
@@ -260,10 +270,10 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
                 UpdateEnemiesInRange();
                 FindAreaTargetEnemies();
                 AttackAoeEnemies();
-                break;            
+                break;
         }
     }
-    
+
     /// <summary>
     /// Attacks the current enemy;
     /// </summary>
@@ -275,7 +285,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
         }
         else
         {
-            enemy.RegisterAttack(damage, trapData.damageType);        
+            enemy.RegisterAttack(damage, trapData.damageType);
         }
     }
 
@@ -284,10 +294,10 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     /// </summary>
     /// <remarks>This is called only for traps that have multiple targets targeting system.</remarks>
     protected virtual void FindMultipleTargetEnemies()
-    {       
+    {
         if (!trapData.hitAllTargetsInRange)
         {
-            affectedEnemies.Clear();            
+            affectedEnemies.Clear();
 
             for (int i = 0; i < enemiesInRange.Count && i < trapData.maxNumberOfTargets; i++)
             {
@@ -295,7 +305,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
                 // But their position in regard to the trap position and rotation, and their destination may be random at this point. 
                 // If this isn't the desired way override this method in a derived class
                 affectedEnemies.Add(enemiesInRange[i]);
-            }            
+            }
         }
     }
 
@@ -317,16 +327,6 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
             {
                 affectedEnemies.Add(affectedEnemy);
             }
-        }
-    }
-
-    // TODO delete this
-    private void OnDrawGizmos()
-    {
-        if (currentEnemy!=null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(currentEnemy.transform.position, trapData.areaOfEffectRange);
         }
     }
 
@@ -381,7 +381,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
 
         if (enemiesInRange.Count == 0)
         {
-            currentEnemy = null; 
+            currentEnemy = null;
             yield return StopAttackCoroutine();
         }
         else
@@ -428,10 +428,10 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
         }
 
         if (state == TrapState.AttackState)
-        {            
-            StopCoroutine(attackCoroutine);            
+        {
+            StopCoroutine(attackCoroutine);
             GoToNormalState();
-            
+
             // Only single attacks have an attack cooldown, continuous attacks ignore such values if they were erroneously set
             if (trapData.attackMode == AttackMode.SingleAttack)
             {
@@ -457,7 +457,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     protected virtual void GoToAttackState()
     {
         state = TrapState.AttackState;
-        hasWaitedForAttackHitDelay = false; 
+        hasWaitedForAttackHitDelay = false;
 
         switch (trapData.attackMode)
         {
@@ -487,7 +487,8 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
             default:
                 throw new UnityException("Trap.GoToAttackState has code for only two attack states.");
         }
-    }
+    } 
+    #endregion
 }
 
 public enum TrapState { NormalState, AttackState }

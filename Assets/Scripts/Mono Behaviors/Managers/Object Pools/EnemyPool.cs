@@ -59,20 +59,6 @@ public class EnemyPool : PoolBase<EnemyType, Enemy>
         }
     }
 
-    protected override void ActivateObject(Enemy objectToActivate)
-    {        
-        objectToActivate.gameObject.SetActive(true);
-
-        //PoolHelper.ActivateObject(objectToActivate);
-    }
-
-    protected override void DeactivateObject(Enemy objectToDeactivate)
-    {
-        objectToDeactivate.gameObject.SetActive(false);
-
-        //PoolHelper.DeactivateObject(objectToDeactivate);
-    }
-
     protected override void InitializeDefaultActivePools()
     {
         // Go through each pool and instantiate a number of objects for it
@@ -80,9 +66,7 @@ public class EnemyPool : PoolBase<EnemyType, Enemy>
         {
             ExpandPool(enemyPools[i].pool, enemyStartCount);
         }
-    }
-
-    
+    }    
 }
 
 [System.Serializable]

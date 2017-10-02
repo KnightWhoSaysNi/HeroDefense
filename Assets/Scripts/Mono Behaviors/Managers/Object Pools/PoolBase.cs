@@ -6,7 +6,7 @@ using UnityEngine;
 
 public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour    
     where TPool : ScriptableObject 
-    where TPoolObject : MonoBehaviour
+    where TPoolObject : MonoBehaviour, IPoolable
 {
     /// <summary>
     /// All different prefabs for which object pools are created.
@@ -47,11 +47,15 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
 
     protected Transform myTransform;
 
-
     /// <summary>
-    /// Get an object from the specified pool and set its parent to the specified transform.
+    /// Get an object from the specified pool with pre/post-activation data, and set its parent.
     /// </summary>
-    public virtual TPoolObject GetObject(TPool pool, Transform parent)
+    /// <param name="pool">Pool to get an object from.</param>
+    /// <param name="parent">New parent of the pooled object.</param>
+    /// <param name="preActivationData">Data used in the pre-activation of the pooled object.</param>
+    /// <param name="postActivationData">Data used in the post-activation of the pooled object.</param>
+    /// <returns></returns>
+    public TPoolObject GetObject(TPool pool, Transform parent, System.Object preActivationData, System.Object postActivationData)
     {
         int countOfAvailableObjects = availablePools[pool].Count;
 
@@ -70,17 +74,24 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
         availablePools[pool].RemoveAt(countOfAvailableObjects - 1);
         unavailablePools[pool].Add(pooledObject);
 
-        // Change parent and activate
-        pooledObject.transform.position = parent.position;
-        pooledObject.transform.rotation = parent.rotation;
+        // Change parent and activate the object 
         pooledObject.transform.SetParent(parent);
-        ActivateObject(pooledObject);
+        ActivatePoolObject(pooledObject, preActivationData, postActivationData);
 
         return pooledObject;
     }
 
     /// <summary>
-    /// Returns all used objects to their respective pools.
+    /// Get an object from the specified pool and set its parent.
+    /// </summary>
+    public TPoolObject GetObject(TPool pool, Transform parent)
+    {
+        TPoolObject pooledObject = GetObject(pool, parent, null, null);
+        return pooledObject;
+    }
+        
+    /// <summary>
+    /// Return all used objects to their respective pools.
     /// </summary>
     public void ReclaimAllObjects()
     {
@@ -128,7 +139,6 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
 
         InitializeDefaultActivePools();
     }
-
     
     protected virtual void Update()
     {
@@ -145,8 +155,6 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
 
     protected abstract void SetAllPools();
     protected abstract void InitializeDefaultActivePools();
-    protected abstract void DeactivateObject(TPoolObject objectToDeactivate);
-    protected abstract void ActivateObject(TPoolObject objectToActivate);
     
 
     /// <summary>
@@ -157,11 +165,11 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
         TPoolObject instantiatedObject = Instantiate(allPools[pool], myTransform);
         availablePools[pool].Add(instantiatedObject);
 
-        DeactivateObject(instantiatedObject);
+        DeactivatePoolObject(instantiatedObject);
     }
 
     /// <summary>
-    /// Expands the specified pool by instantiating new object for it.
+    /// Expands the specified pool by instantiating new objects for it.
     /// </summary>
     /// <param name="newObjectCount">Count of objects to instantiate.</param>
     protected virtual void ExpandPool(TPool poolToExpand, int newObjectCount)
@@ -172,16 +180,40 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Removes the object from its unavailable pool (if necessary), adds it to the available pool and deactivates it.
+    /// </summary>
     protected virtual void ReclaimObject(TPool pool, TPoolObject objectToReclaim, bool shouldRemoveImmediately)
     {
         if (shouldRemoveImmediately)
         {
             unavailablePools[pool].Remove(objectToReclaim);
         }
+
         availablePools[pool].Add(objectToReclaim);
 
-        DeactivateObject(objectToReclaim);
+        DeactivatePoolObject(objectToReclaim);
         objectToReclaim.transform.SetParent(myTransform, false);
+    }
+
+    /// <summary>
+    /// Calls the specified pool object's pre/post-activation methods before/after activating the game object it belongs to.
+    /// </summary>
+    private void ActivatePoolObject(TPoolObject objectToActivate, System.Object preActivationData, System.Object postActivationData)
+    {
+        objectToActivate.PreActivation(preActivationData);
+        objectToActivate.gameObject.SetActive(true);
+        objectToActivate.PostActivation(postActivationData);
+    }
+
+    /// <summary>
+    /// Calls the specified pool object's pre/post-deactivation methods before/after deactivating the game object it belongs to.
+    /// </summary>
+    private void DeactivatePoolObject(TPoolObject objectToDeactivate)
+    {
+        objectToDeactivate.PreDeactivation();
+        objectToDeactivate.gameObject.SetActive(false);
+        objectToDeactivate.PostDeactivation();
     }
 }
 

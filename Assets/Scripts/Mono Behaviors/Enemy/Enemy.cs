@@ -5,10 +5,11 @@ using UnityEngine;
 [RequireComponent(typeof(Renderer))]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(MoveAgent))]
-public class Enemy : MonoBehaviour // Refactor
+public class Enemy : MonoBehaviour, IPoolable // Refactor
 {
+    #region - Fields -
     public EnemyType enemyType;
-    
+
     public EnemyData enemyData;
     [HideInInspector]
     public MoveAgent moveAgent;
@@ -19,21 +20,26 @@ public class Enemy : MonoBehaviour // Refactor
     protected new Renderer renderer;
     protected Material originalMaterial;
 
-    protected EnemyState state;       
+    protected EnemyState state;
     [Range(0, 10)]
     [SerializeField]
     protected float minTimeInAttackedState = 0.1f;
     private float hitTimer = -1;
     private float deathTimer = -1;
-    protected float currentHealth;    
+    protected float currentHealth;
     protected bool isHit;
     protected bool isDead;
 
-    private new Collider collider;
-       
-    public delegate void EnemyDiedHandler(Enemy enemy, Collider collider, bool hasFinishedLevel);
-    public static event EnemyDiedHandler EnemyDied;
+    protected new Collider collider;
+    protected Transform myTransform;
+    #endregion
 
+    #region - Delegates and events -
+    public delegate void EnemyDiedHandler(Enemy enemy, Collider collider, bool hasFinishedLevel);
+    public static event EnemyDiedHandler EnemyDied; 
+    #endregion
+
+    #region - Properties -
     public bool IsDead
     {
         get
@@ -90,11 +96,13 @@ public class Enemy : MonoBehaviour // Refactor
             return enemyData.energyDrain;
         }
     }
+    #endregion
 
+    #region - Public methods -
     /// <summary>
     /// Tells the enemy that it has been attacked and provides information about that attack.
     /// </summary>
-    public virtual void RegisterAttack(float damage, DamageType damageType) 
+    public virtual void RegisterAttack(float damage, DamageType damageType)
     {
         isHit = true;
         TakeDamage(damage, damageType);
@@ -116,26 +124,23 @@ public class Enemy : MonoBehaviour // Refactor
             dieParticleEffect.Play();
             EnemyDied?.Invoke(this, collider, false);
         }
-    }    
-        
+    }
+    #endregion
+
+    #region - MonoBehavior methods -
     protected virtual void Awake()
-    {        
-        state = EnemyState.NormalState;        
+    {
+        state = EnemyState.NormalState;
+
         moveAgent = GetComponent<MoveAgent>();
-
         renderer = GetComponent<Renderer>();
-        originalMaterial = renderer.sharedMaterial;
-
-        currentHealth = enemyData.maxHealth;
         collider = GetComponent<Collider>();
-
-        // TODO Change this if there is a death animation, not just the particle effect
-        deathTimer = dieParticleEffect.main.duration;
+        originalMaterial = renderer.sharedMaterial;
+        myTransform = this.transform;
     }
 
     protected virtual void Start()
-    {
-        moveAgent.agent.speed = enemyData.movementSpeed;
+    {       
     }
 
     protected virtual void Update()
@@ -146,7 +151,7 @@ public class Enemy : MonoBehaviour // Refactor
         }
 
         if (isDead && deathTimer >= 0)
-        {            
+        {
             deathTimer -= Time.deltaTime;
 
             if (deathTimer <= 0)
@@ -157,6 +162,47 @@ public class Enemy : MonoBehaviour // Refactor
         }
     }
 
+    #endregion
+
+    #region - IPoolable interface implementation -
+    public virtual void PreActivation(System.Object preActivationData)
+    {
+        myTransform.position = myTransform.parent.position;
+        myTransform.rotation = myTransform.parent.rotation;
+    }
+    public virtual void PostActivation(System.Object postActivationData)
+    {
+        moveAgent.agent.enabled = true;
+        if (postActivationData != null)
+        {
+            Vector3 destination = (Vector3)postActivationData;
+            moveAgent.SetTarget(destination);
+        }
+        
+    }
+    public virtual void PreDeactivation()
+    {
+        moveAgent.agent.enabled = false;
+    }
+    public virtual void PostDeactivation()
+    {
+        if (state != EnemyState.NormalState)
+        {
+            GoToNormalState();
+        }
+
+        isDead = false;
+        isHit = false;
+        currentHealth = enemyData.maxHealth;
+        hitTimer = -1;
+        // TODO Change this if there is a death animation, not just the particle effect
+        deathTimer = dieParticleEffect.main.duration;
+
+        UpdateRenderers();
+    }
+    #endregion
+
+    #region - Protected methods -
     /// <summary>
     /// Checks if the enemy was hit. Goes into attacked state for <see cref="minTimeInAttackedState"/> seconds, after which it returns to
     /// the normal state, unless it was hit again during those <see cref="minTimeInAttackedState"/> seconds.
@@ -196,26 +242,7 @@ public class Enemy : MonoBehaviour // Refactor
         {
             Die();
         }
-    }
-
-    /// <summary>
-    /// Resets enemy so that it is ready for use next time someone calls him from the pool.
-    /// </summary>
-    protected virtual void OnDisable()
-    {
-        if (state != EnemyState.NormalState)
-        {
-            GoToNormalState();
-        }
-
-        isDead = false;
-        isHit = false;
-        currentHealth = enemyData.maxHealth;
-        hitTimer = -1;
-        deathTimer = dieParticleEffect.main.duration;
-
-        UpdateRenderers();
-    }
+    }    
 
     protected virtual void UpdateRenderers()
     {
@@ -238,7 +265,8 @@ public class Enemy : MonoBehaviour // Refactor
         state = EnemyState.NormalState;
         moveAgent.agent.speed = enemyData.movementSpeed;
         renderer.material = originalMaterial;
-    }
+    } 
+    #endregion
 }
 
 public enum EnemyState { NormalState, AttackedState }

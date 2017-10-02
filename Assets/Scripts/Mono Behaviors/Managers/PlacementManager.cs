@@ -5,22 +5,26 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlacementManager : Raycaster
-{        
+{
+    #region - Fields -
     [Range(0, 1)]
-    [SerializeField] private float percentReturnOnSell;
+    [SerializeField]
+    private float percentReturnOnSell;
     public List<Placeable> placeables;
     [HideInInspector]
     public Transform placeableParent;
     private Placeable activePlaceable;
     private int placeableIndex;
     private bool isIndexChanged;
-    
+
     private bool isInPlacementMode;
     private bool canBePlaced;
     [Tooltip("Max distance at which placement of the placeable can happen.")]
-    [SerializeField] private float placementRange = 100;
+    [SerializeField]
+    private float placementRange = 100;
     [Tooltip("How much to rotate the placeable by, in degrees, with each scroll action.")]
-    [SerializeField] private float rotationDegreesAmount;
+    [SerializeField]
+    private float rotationDegreesAmount;
     private float currentRotationDegrees;
     private float scrollValue;
 
@@ -32,8 +36,11 @@ public class PlacementManager : Raycaster
     private Vector3 zFightingOffset;
     private Vector3 placementPosition;
     private Vector3 lastPlacedPosition;
+    #endregion
 
-    public static event Action<bool> PlacementModeChanged;
+    #region - Events -
+    public static event Action<bool> PlacementModeChanged; 
+    #endregion
 
     #region - "Singleton" Instance -
     private static PlacementManager instance;
@@ -64,21 +71,24 @@ public class PlacementManager : Raycaster
         }
     }
     #endregion
-       
+
+    #region - Properties -
     private bool CanBePlaced
     {
         get
         {
-            canBePlaced = 
-                Input.GetButtonDown("Fire1") && 
-                Player.Instance.Gold >= activePlaceable.GoldCost && 
-                placementPosition != lastPlacedPosition && 
+            canBePlaced =
+                Input.GetButtonDown("Fire1") &&
+                Player.Instance.Gold >= activePlaceable.GoldCost &&
+                placementPosition != lastPlacedPosition &&
                 activePlaceable.CanBePlaced;
 
             return canBePlaced;
         }
     }
+    #endregion
 
+    #region - Public methods -
     /// <summary>
     /// Calculates and returns the sell price for the placeable.
     /// </summary>
@@ -98,7 +108,9 @@ public class PlacementManager : Raycaster
         // Return to the pool
         PlaceablePool.Instance.ReclaimObject(placeableToSell.placeableType, placeableToSell);
     }
+    #endregion
 
+    #region - MonoBehavior methods -
     protected new void Awake()
     {
         InitializeSingleton();
@@ -110,17 +122,19 @@ public class PlacementManager : Raycaster
 
     private void Start()
     {
-        SceneManager.sceneLoaded += (loadedScene, loadSceneMode) => ResetPlacement() ;
+        SceneManager.sceneLoaded += (loadedScene, loadSceneMode) => ResetPlacement();
         LevelManager.LevelRestarted += ResetPlacement;
     }
-    
+
     private void Update()
     {
         CheckForActivePlaceableChange();
         CheckForPlacementModeToggle();
-        CheckForPlacement();        
+        CheckForPlacement();
     }
+    #endregion
 
+    #region - Private methods -
     /// <summary>
     /// Checks if the user has requested to build a different placeable than the one currently active.
     /// </summary>
@@ -132,7 +146,7 @@ public class PlacementManager : Raycaster
             isIndexChanged = true;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2) && placeableIndex != 1)
-        {            
+        {
             placeableIndex = 1;
             isIndexChanged = true;
         }
@@ -163,7 +177,7 @@ public class PlacementManager : Raycaster
     private void CheckForPlacementModeToggle()
     {
         if (Input.GetKeyDown(KeyCode.B))
-        {            
+        {
             isInPlacementMode = !isInPlacementMode;
             PlacementModeChanged?.Invoke(isInPlacementMode);
 
@@ -272,7 +286,7 @@ public class PlacementManager : Raycaster
 
         lastPlacedPosition = placementPosition;
         //currentRotationDegrees = 0;
-    } 
+    }
     #endregion
 
     private void ResetPlacement()
@@ -285,5 +299,6 @@ public class PlacementManager : Raycaster
             PlaceablePool.Instance.ReclaimObject(activePlaceable.placeableType, activePlaceable);
             activePlaceable = null;
         }
-    }
+    } 
+    #endregion
 }

@@ -57,20 +57,6 @@ public class PlaceablePool : PoolBase<PlaceableType, Placeable>
         }
     }
 
-    protected override void ActivateObject(Placeable objectToActivate)
-    {
-        objectToActivate.gameObject.SetActive(true);
-
-        //PoolHelper.ActivateObject(objectToActivate);        
-    }
-
-    protected override void DeactivateObject(Placeable objectToDeactivate)
-    {
-        objectToDeactivate.gameObject.SetActive(false);
-
-        //PoolHelper.DeactivateObject(objectToDeactivate);
-    }
-
     protected override void InitializeDefaultActivePools()
     {
         // Go through each pool and instantiate a number of objects for it

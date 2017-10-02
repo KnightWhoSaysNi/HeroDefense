@@ -8,6 +8,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class MoveAgent : MonoBehaviour  // TODO Refactor
 {
+    [HideInInspector]
     public NavMeshAgent agent; 
     private Transform followTargetTransform;
     private Vector3 targetPosition;
@@ -66,6 +67,7 @@ public class MoveAgent : MonoBehaviour  // TODO Refactor
 
     private void Awake()
     {
+        agent = GetComponent<NavMeshAgent>();
         zeroVector = Vector3.zero;
     }
 

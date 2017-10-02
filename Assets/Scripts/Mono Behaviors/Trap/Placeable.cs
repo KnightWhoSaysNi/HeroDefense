@@ -6,8 +6,9 @@ using UnityEngine.Rendering;
 
 [RequireComponent(typeof(BoxCollider))]
 [RequireComponent(typeof(Rigidbody))]
-public abstract class Placeable : MonoBehaviour // TODO Write custom editor | Refactor
+public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom editor | Refactor
 {
+    #region - Fields -    
     public PlaceableType placeableType;
     public GameObject rangeVisual;
 
@@ -21,12 +22,13 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor | Re
     /// </summary>
     [Tooltip("Value by which to multiple a normalized vector that is added to the placeable's local up position in order to raise/lower it." +
         " If left at 0 placeable won't be raised at all. Blender files should already be set correctly and don't need this value.")]
-    [SerializeField] private float placementOffsetMultiplier;    
+    [SerializeField]
+    private float placementOffsetMultiplier;
 
-    [SerializeField] private Renderer[] renderers;                    // Renderes whose materials can change for valid/invalid placement and for placed object
-    [SerializeField] private Material[] transparentMaterials;         // Materials used by renderers to show valid placement    
-    [SerializeField] private Material illegalPlacementMaterial; // TODO Replace the illegalPlacementMaterials array with just 1 illegal placement material ADD TO CONST
-    private Material[] originalMaterials;           // Original materials that will be used by renderers when the object is placed    
+    [SerializeField] private Renderer[] renderers;                  // Renderes whose materials can change for valid/invalid placement and for placed object
+    [SerializeField] private Material[] transparentMaterials;       // Materials used by renderers to show valid placement    
+    [SerializeField] private Material illegalPlacementMaterial;     // TODO Replace the illegalPlacementMaterials array with just 1 illegal placement material ADD TO CONST
+    private Material[] originalMaterials;                           // Original materials that will be used by renderers when the object is placed    
 
     private Color illegalPlacementColor;
     private int countOfRenderers;
@@ -37,7 +39,9 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor | Re
     // The placeable needs to have at least 1 collided object - the one one which it is being placed
     public List<GameObject> currentlyCollidedObjects; // TEST Set this back to private HashSet
     private int numberOfCollidedPlaceables;
+    #endregion
 
+    #region - Properties -
     public float PlacementOffsetMultiplier
     {
         get
@@ -66,7 +70,7 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor | Re
             {
                 // Whenever the placeable is placed its position is cached. 
                 // If it is removed the position doesn't need to be updated as it is not supposed to be called in that case
-                position = transform.position; 
+                position = transform.position;
 
                 // Placed placeables use their original materials
                 for (int i = 0; i < countOfRenderers; i++)
@@ -104,16 +108,20 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor | Re
             CheckPlacementValidity();
         }
     }
+    #endregion
 
+    #region - Public methods -
     /// <summary>
     /// Return the state of the placeable to before it was placed.
     /// </summary>
     public void Sell()
-    {        
+    {
         OnSold();
         // OnDisable will be called after this method as the game object will be deactivated
     }
+    #endregion
 
+    #region - MonoBehavior methods -
     protected void Awake()
     {
         currentlyCollidedObjects = new List<GameObject>();
@@ -138,7 +146,7 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor | Re
 
     protected void Start()
     {
-        print("Refactor: Change public fields to serialized private fields wherever possible (which should be true for all scripts");
+        // Used if the placeable was placed in editor
         if (isPlaced)
         {
             IsPlaced = true;
@@ -149,11 +157,33 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor | Re
     {
         IsPlaced = false;
         isInIllegalState = false;
-        numberOfCollidedPlaceables = 0;       
+        numberOfCollidedPlaceables = 0;
         currentlyCollidedObjects.Clear();
         rangeVisual.SetActive(true);
-    }
+    } 
+    #endregion
 
+    #region - IPoolable interface methods -
+    // OnDisable is used for post-deactivation. Pre/post-activation and pre-deactivation are not needed for base placeable
+    public virtual void PreActivation(System.Object data)
+    {
+
+    }
+    public virtual void PostActivation(System.Object data)
+    {
+
+    }
+    public virtual void PreDeactivation()
+    {
+
+    }
+    public virtual void PostDeactivation()
+    {
+
+    }
+    #endregion
+
+    #region - Protected methods -
     // Action to be overriden for each placeable that needs additional logic after it's been placed
     protected virtual void OnPlaced()
     {
@@ -164,7 +194,9 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor | Re
     protected virtual void OnSold()
     {
     }
+    #endregion
 
+    #region - Private methods -
     private void OnTriggerEnter(Collider other)
     {
         if (isPlaced)
@@ -193,16 +225,16 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor | Re
             return;
         }
 
-        if (other.CompareTag("Placeable") || other.CompareTag("Sellable")) 
+        if (other.CompareTag("Placeable") || other.CompareTag("Sellable"))
         {
             NumberOfCollidedPlaceables--;
-        }        
+        }
         else if (!other.CompareTag("Enemy")) // ADD TO CONST
         {
             currentlyCollidedObjects.Remove(other.gameObject);
             CheckPlacementValidity();
         }
-    } 
+    }
 
     private void CheckPlacementValidity()
     {
@@ -227,5 +259,6 @@ public abstract class Placeable : MonoBehaviour // TODO Write custom editor | Re
                 }
             }
         }
-    }
+    } 
+    #endregion
 }
