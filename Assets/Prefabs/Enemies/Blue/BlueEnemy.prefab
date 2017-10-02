@@ -203,7 +203,7 @@ MonoBehaviour:
   - {fileID: 23481092031334442}
   dieParticleEffect: {fileID: 198801087134912992}
   hitMaterial: {fileID: 2100000, guid: 5c53385be2a4d4f4d8cdd1770e5ec771, type: 2}
-  minTimeInAttackedState: 0.1
+  minTimeInAttackedState: 0.25
 --- !u!114 &114766069959928798
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -234,7 +234,7 @@ NavMeshAgent:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1617265491685084}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 5
