@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EnemyData", menuName = "Custom Enemy")]
 public class EnemyData : ScriptableObject
 {
-    // ADD TO CONST
+    // ADD TO CONST?
     [Range(0, 1000)] public float maxHealth;
     [Range(0, 100)] public float movementSpeed;
     [Range(0, 1000)] public int energyDrain;

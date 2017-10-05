@@ -8,10 +8,6 @@ public class SceneLoader : MonoBehaviour
     public CanvasGroup fadeCanvasGroup;
     public float fadeSpeed = 2f;
 
-    private readonly string mainMenuSceneName = "MainMenu"; // ADD TO CONST
-    private readonly string gameplayUISceneName = "GameplayUI"; // ADD TO CONST
-    private readonly string tutorialSceneName = "TutorialLevel"; // ADD TO CONST
-
     private bool isGameplayUILoaded;
 
     public event System.Action MainMenuLoading;
@@ -71,7 +67,7 @@ public class SceneLoader : MonoBehaviour
     public void LoadMainMenu()
     {
         MainMenuLoading?.Invoke();
-        LoadScene(mainMenuSceneName);
+        LoadScene(Constants.MainMenuSceneName);
     }
 
     /// <summary>
@@ -80,7 +76,7 @@ public class SceneLoader : MonoBehaviour
     /// <remarks>Uses additive load scene mode.</remarks>
     public void LoadTutorialLevel()
     {
-        LoadScene(tutorialSceneName);
+        LoadScene(Constants.TutorialSceneName);
     }
 
     private void Awake()
@@ -99,7 +95,7 @@ public class SceneLoader : MonoBehaviour
 
         AsyncOperation loadingOperation; 
 
-        if (isGameplayUILoaded && sceneName != mainMenuSceneName)
+        if (isGameplayUILoaded && sceneName != Constants.MainMenuSceneName)
         {
             // Going from level to level, so unload the current scene and additively load the new one
             SceneManager.UnloadSceneAsync(0);
@@ -116,7 +112,7 @@ public class SceneLoader : MonoBehaviour
             yield return null;
         }
         
-        if (sceneName == mainMenuSceneName)
+        if (sceneName == Constants.MainMenuSceneName)
         {
             // Went back from a level to the main scene so gameplayUI scene was unloaded
             isGameplayUILoaded = false;
@@ -132,7 +128,7 @@ public class SceneLoader : MonoBehaviour
             else
             {
                 // Went from MainMenu to the level scene so loading the GameplayUI additively
-                SceneManager.LoadSceneAsync(gameplayUISceneName, LoadSceneMode.Additive);
+                SceneManager.LoadSceneAsync(Constants.GameplayUISceneName, LoadSceneMode.Additive);
                 isGameplayUILoaded = true;
             }
         }

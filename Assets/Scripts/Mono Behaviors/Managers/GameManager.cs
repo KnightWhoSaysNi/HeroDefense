@@ -109,14 +109,14 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene loadedScene, LoadSceneMode loadedSceneMode)
     {
-        if (loadedScene.name == "MainMenu") // ADD TO CONST
+        if (loadedScene.name == Constants.MainMenuSceneName) 
         {
             playerController.enabled = false;
             PlacementManager.Instance.enabled = false;
 
             canPauseGame = false;
         }
-        else if (loadedScene.name != "GameplayUI") // ADD TO CONST 
+        else if (loadedScene.name != Constants.GameplayUISceneName)
         {
             // Level scene loaded
             if (!IsGamePaused)

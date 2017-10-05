@@ -11,7 +11,7 @@ public class EnemyDestroyer : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy")) // ADD TO CONST
+        if (other.CompareTag(Constants.EnemyTag)) 
         {
             Enemy enemy = other.GetComponent<Enemy>();
 

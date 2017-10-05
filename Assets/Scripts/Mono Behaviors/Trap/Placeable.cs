@@ -27,10 +27,9 @@ public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom 
 
     [SerializeField] private Renderer[] renderers;                  // Renderes whose materials can change for valid/invalid placement and for placed object
     [SerializeField] private Material[] transparentMaterials;       // Materials used by renderers to show valid placement    
-    [SerializeField] private Material illegalPlacementMaterial;     // TODO Replace the illegalPlacementMaterials array with just 1 illegal placement material ADD TO CONST
+    [SerializeField] private Material illegalPlacementMaterial;     // Material used to display illegal placement
     private Material[] originalMaterials;                           // Original materials that will be used by renderers when the object is placed    
-
-    private Color illegalPlacementColor;
+    
     private int countOfRenderers;
     private bool isInIllegalState;
 
@@ -128,16 +127,11 @@ public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom 
 
         countOfRenderers = renderers.Length;
         originalMaterials = new Material[countOfRenderers];
-        illegalPlacementColor = new Color(1, 0, 0, 0.75f); // ADD TO CONST
 
         for (int i = 0; i < countOfRenderers; i++)
         {
             // Cache original materials - the materials used in placed state
             originalMaterials[i] = renderers[i].sharedMaterial;
-
-            // Create and cache illegal placement materials based on the original ones
-            Material illegalPlacementMaterial = new Material(transparentMaterials[i]);
-            illegalPlacementMaterial.color = illegalPlacementColor;
 
             // At the start this object is not yet placed so transparent materials are used
             renderers[i].material = transparentMaterials[i];
@@ -205,11 +199,11 @@ public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom 
             return;
         }
 
-        if (other.CompareTag("Placeable") || other.CompareTag("Sellable")) // ADD TO CONST
+        if (other.CompareTag(Constants.PlaceableTag) || other.CompareTag(Constants.SellableTag)) 
         {
             NumberOfCollidedPlaceables++;
         }
-        else if (!other.CompareTag("Enemy")) // ADD TO CONST
+        else if (!other.CompareTag(Constants.EnemyTag)) 
         {
 
             currentlyCollidedObjects.Add(other.gameObject);
@@ -225,11 +219,11 @@ public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom 
             return;
         }
 
-        if (other.CompareTag("Placeable") || other.CompareTag("Sellable"))
+        if (other.CompareTag(Constants.PlaceableTag) || other.CompareTag(Constants.SellableTag))
         {
             NumberOfCollidedPlaceables--;
         }
-        else if (!other.CompareTag("Enemy")) // ADD TO CONST
+        else if (!other.CompareTag(Constants.EnemyTag))
         {
             currentlyCollidedObjects.Remove(other.gameObject);
             CheckPlacementValidity();

@@ -10,11 +10,7 @@ public class UIManager : Raycaster
     public Sprite emptySlotSprite;
     private GameplayUIData gameplayUIData;
     private MainMenuUIData mainMenuUIData;
-
-    // ADD TO CONST
-    private readonly string levelStartMessage = "Press G to start";
-    private readonly string waveStartedMessage = "Wave started";
-    private readonly string finalWaveMessage = "Final wave";
+    
     /// <summary>
     /// Amount of seconds to keep the message visible
     /// </summary>
@@ -469,7 +465,7 @@ public class UIManager : Raycaster
     private void ShowLevelStartMessage()
     {
         gameplayUIData.messagingCanvas.SetActive(true);
-        gameplayUIData.message.text = levelStartMessage;
+        gameplayUIData.message.text = Constants.LevelStartMessage;
     }
     #endregion
 
@@ -540,13 +536,13 @@ public class UIManager : Raycaster
         // A LOT of "else if" checks are used so that no unnecessary canvas activation/deactivation happens with each frame
         if (Physics.Raycast(cameraRay, out raycastHit, 25, raycastHitLayerMask)) // ADD TO CONST max distance
         {
-            if (raycastHit.transform.CompareTag("Enemy")) // ADD TO CONST
+            if (raycastHit.transform.CompareTag(Constants.EnemyTag)) 
             {
                 // Enemy is hit
                 ActivePlaceable = null;
                 UpdateActiveEnemy();
             }
-            else if (raycastHit.transform.CompareTag("Placeable") || raycastHit.transform.CompareTag("Sellable")) // ADD TO CONST
+            else if (raycastHit.transform.CompareTag(Constants.PlaceableTag) || raycastHit.transform.CompareTag(Constants.SellableTag))
             {
                 // Placeable is hit
                 activeEnemy = null;
@@ -662,7 +658,7 @@ public class UIManager : Raycaster
             {
                 shouldShowCountdown = false;
 
-                ShowMessage(isFinalWave ? finalWaveMessage : waveStartedMessage, defaultMessageAliveTime);
+                ShowMessage(isFinalWave ? Constants.FinalWaveMessage : Constants.WaveStartedMessage, defaultMessageAliveTime);
             }
 
             countdownTimer -= Time.deltaTime;
@@ -692,7 +688,7 @@ public class UIManager : Raycaster
 
     private void OnSceneLoaded(Scene loadedScene, LoadSceneMode loadSceneMode)
     {
-        if (loadedScene.name == "MainMenu") // ADD TO CONST
+        if (loadedScene.name == Constants.MainMenuSceneName) 
         {
             // GameplayUIData holds only nulls, because GameplayUI scene was removed. 
             // IsReadyToReceiveUpdates property needs to return false and that is assured by setting gameplayUIData to null

@@ -100,7 +100,7 @@ public static class EditorHelper
     {
         Wave wave = ScriptableObject.CreateInstance<Wave>();
 
-        string waveSaveFolder = "Assets/Data/Waves"; // ADD TO CONST
+        string waveSaveFolder = Constants.DataWavesPath;
 
         // If the wave save folder doesn't exist uses Assets main folder. In both cases unique files names are generated
         string assetPath = UnityEditor.AssetDatabase.IsValidFolder(waveSaveFolder) ?

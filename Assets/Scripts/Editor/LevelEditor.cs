@@ -68,8 +68,8 @@ public class LevelEditor : Editor
     private void OnEnable()
     {
         // Validation circles 
-        greenCircle = AssetDatabase.LoadAssetAtPath("Assets/Textures/Editor/GreenCircle.png", typeof(Texture)) as Texture; // ADD TO CONST !
-        redCircle = AssetDatabase.LoadAssetAtPath("Assets/Textures/Editor/RedCircle.png", typeof(Texture)) as Texture; // ADD TO CONST !
+        greenCircle = AssetDatabase.LoadAssetAtPath(Constants.TexturesGreenCirclePath, typeof(Texture)) as Texture; 
+        redCircle = AssetDatabase.LoadAssetAtPath(Constants.TexturesRedCirclePath, typeof(Texture)) as Texture; 
         if (greenCircle != null && redCircle != null)
         {
             greenCircleContent = new GUIContent(greenCircle);
@@ -111,9 +111,9 @@ public class LevelEditor : Editor
     {
         // TODO delete test code below and populate method
         Rect isValidRect = new Rect(rect.x + 10, rect.y, 55, EditorGUIUtility.singleLineHeight);
-        EditorGUI.LabelField(isValidRect, "IsValid");                                                                               // IsValid column
-        EditorGUI.LabelField(new Rect(isValidRect.xMax, rect.y, rect.max.x - 100, EditorGUIUtility.singleLineHeight), "Wave");     // Wave column
-        EditorGUI.LabelField(new Rect(rect.xMax - 85, rect.y, 100, EditorGUIUtility.singleLineHeight), "WaveCount");              // WaveCount column
+        EditorGUI.LabelField(isValidRect, "IsValid");                                                                                // IsValid column
+        EditorGUI.LabelField(new Rect(isValidRect.xMax, rect.y, rect.max.x - 100, EditorGUIUtility.singleLineHeight), "Wave");       // Wave column
+        EditorGUI.LabelField(new Rect(rect.xMax - 85, rect.y, 100, EditorGUIUtility.singleLineHeight), "WaveCount");                 // WaveCount column
     }
 
     private void DrawListFooter(Rect rect)
@@ -177,18 +177,18 @@ public class LevelEditor : Editor
 
         #region - Add new wave -
         if (GUILayout.Button(new GUIContent("Add new wave", "Copies the last wave in the list."),
-            GUILayout.Height(30), GUILayout.MinWidth(130))) // TODO perhaps put height in a field or add to consts 
+            GUILayout.Height(30), GUILayout.MinWidth(130)))
         {
             ReorderableList.defaultBehaviours.DoAddButton(reorderableList);
         }
         #endregion
 
         #region - Add existing wave -
-        if (GUILayout.Button(new GUIContent("Add existing wave", "Shows only waves in Assets/Data/Waves"),
+        if (GUILayout.Button(new GUIContent("Add existing wave", $"Shows only waves in {Constants.DataWavesPath}"),
             GUILayout.Height(30), GUILayout.MinWidth(130)))
         {
             GenericMenu menu = new GenericMenu();
-            string[] guids = AssetDatabase.FindAssets("t:Wave", new string[] { "Assets/Data/Waves" });
+            string[] guids = AssetDatabase.FindAssets("t:Wave", new string[] { Constants.DataWavesPath });
 
             foreach (string guid in guids)
             {

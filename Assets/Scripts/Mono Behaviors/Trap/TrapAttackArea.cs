@@ -7,7 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class TrapAttackArea : MonoBehaviour
 {
-    public LayerMask enemyLayerMask; // ADD TO CONST
+    public LayerMask enemyLayerMask;
     public Dictionary<Collider, Enemy> enemiesInArea;
 
     public delegate void EnemyTrackHandler(Enemy enemy, bool isInAttackArea);
@@ -43,7 +43,7 @@ public class TrapAttackArea : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy")) // ADD TO CONST
+        if (other.CompareTag(Constants.EnemyTag)) 
         {
             Enemy enemy = other.gameObject.GetComponent<Enemy>();
             // TODO The second check shouldn't really be necessary (dead enemies shouldn't move any more). Unless the trap itself moves
@@ -57,7 +57,7 @@ public class TrapAttackArea : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Enemy")) // ADD TO CONST
+        if (other.CompareTag(Constants.EnemyTag)) 
         {
             if (enemiesInArea.ContainsKey(other))
             {

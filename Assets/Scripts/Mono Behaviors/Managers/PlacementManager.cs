@@ -117,7 +117,7 @@ public class PlacementManager : Raycaster
 
         base.Awake();
 
-        zFightingOffset = new Vector3(0.001f, 0.001f, 0.001f);  // ADD TO CONST ?
+        zFightingOffset = new Vector3(0.001f, 0.001f, 0.001f); 
     }
 
     private void Start()

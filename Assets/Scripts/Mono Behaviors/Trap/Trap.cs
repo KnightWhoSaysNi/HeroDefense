@@ -462,10 +462,10 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
         switch (trapData.attackMode)
         {
             case AttackMode.SingleAttack:
-                animator.SetTrigger("Attacked"); // ADD TO CONST
+                animator.SetTrigger(Constants.TrapAnimatorAttackedTrigger); 
                 break;
             case AttackMode.ContinuousAttack:
-                animator.SetBool("IsAttacking", true); // ADD TO CONST
+                animator.SetBool(Constants.TrapAnimatorIsAttackingBool, true); 
                 break;
             default:
                 throw new UnityException("Trap.GoToAttackState has code for only two attack states.");
@@ -482,7 +482,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
                 // By default single attack trap uses a trigger and nothing more is added here
                 break;
             case AttackMode.ContinuousAttack:
-                animator.SetBool("IsAttacking", false); // ADD TO CONST
+                animator.SetBool(Constants.TrapAnimatorIsAttackingBool, false); 
                 break;
             default:
                 throw new UnityException("Trap.GoToAttackState has code for only two attack states.");

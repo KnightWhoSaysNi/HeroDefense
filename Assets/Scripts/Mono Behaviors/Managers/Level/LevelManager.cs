@@ -163,7 +163,7 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
 
     private void OnSceneLoaded(Scene loadedScene, LoadSceneMode loadedSceneMode)
     {
-        if (loadedScene.name != "MainMenu" && loadedScene.name != "GameplayUI") // ADD TO CONST
+        if (loadedScene.name != Constants.MainMenuSceneName && loadedScene.name != Constants.GameplayUISceneName) 
         {
             newlyLoadedSceneName = loadedScene.name;
             isResetRequired = true;
