@@ -2,22 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Renderer))]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(MoveAgent))]
 public class Enemy : MonoBehaviour, IPoolable // Refactor
 {
     #region - Fields -
-    public EnemyType enemyType;
-
-    public EnemyData enemyData;
-    [HideInInspector]
-    public MoveAgent moveAgent;
-
-    public Renderer[] otherRenderers;
-    public ParticleSystem dieParticleEffect;
-    public Material hitMaterial;
-    protected new Renderer renderer;
+    [SerializeField] protected EnemyType enemyType;        
+    [SerializeField] protected EnemyData enemyData;
+    [SerializeField] protected MoveAgent moveAgent;
+    [Space(5)]
+    [SerializeField] protected Renderer[] otherRenderers;
+    [SerializeField] protected ParticleSystem dieParticleEffect;
+    [SerializeField] protected Material hitMaterial;
+    [SerializeField] protected new Renderer renderer;
     protected Material originalMaterial;
 
     protected EnemyState state;
@@ -40,6 +37,21 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
     #endregion
 
     #region - Properties -
+    public EnemyType EnemyType
+    {
+        get
+        {
+            return enemyType;
+        }
+    }
+    public MoveAgent MoveAgent
+    {
+        get
+        {
+            return moveAgent;
+        }
+    }
+
     public bool IsDead
     {
         get
@@ -132,15 +144,13 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
     {
         state = EnemyState.NormalState;
 
-        moveAgent = GetComponent<MoveAgent>();
-        renderer = GetComponent<Renderer>();
-        collider = GetComponent<Collider>();
-        originalMaterial = renderer.sharedMaterial;
+        collider = GetComponent<Collider>();        
         myTransform = this.transform;
     }
 
     protected virtual void Start()
-    {       
+    {
+        originalMaterial = renderer.sharedMaterial;
     }
 
     protected virtual void Update()

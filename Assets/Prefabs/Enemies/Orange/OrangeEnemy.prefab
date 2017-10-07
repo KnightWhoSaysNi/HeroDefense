@@ -28,6 +28,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1147857061656144
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4937098908349496}
+  - component: {fileID: 198797337565635906}
+  - component: {fileID: 199236239609368464}
+  m_Layer: 9
+  m_Name: EnemyDieEffect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1617265491685084
 GameObject:
   m_ObjectHideFlags: 0
@@ -45,23 +62,6 @@ GameObject:
   m_Layer: 9
   m_Name: OrangeEnemy
   m_TagString: Enemy
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &1988356544883484
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 4889181286397132}
-  - component: {fileID: 198801087134912992}
-  - component: {fileID: 199634368945361030}
-  m_Layer: 9
-  m_Name: Particle System
-  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -90,16 +90,16 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4373118937561738}
-  - {fileID: 4889181286397132}
+  - {fileID: 4937098908349496}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
---- !u!4 &4889181286397132
+--- !u!4 &4937098908349496
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1988356544883484}
+  m_GameObject: {fileID: 1147857061656144}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -198,11 +198,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyType: {fileID: 11400000, guid: df3f97171b08c184b9c64f99959b0fc3, type: 2}
   enemyData: {fileID: 11400000, guid: f219d463ac2f8c8439d029dc61a825ca, type: 2}
-  moveAgent: {fileID: 0}
+  moveAgent: {fileID: 114766069959928798}
   otherRenderers:
   - {fileID: 23481092031334442}
-  dieParticleEffect: {fileID: 198801087134912992}
+  dieParticleEffect: {fileID: 198797337565635906}
   hitMaterial: {fileID: 2100000, guid: 1d623ce3b8fbd2c4f89a158758231a27, type: 2}
+  renderer: {fileID: 23863883400067578}
   minTimeInAttackedState: 0.3
 --- !u!114 &114766069959928798
 MonoBehaviour:
@@ -249,12 +250,12 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!198 &198801087134912992
+--- !u!198 &198797337565635906
 ParticleSystem:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1988356544883484}
+  m_GameObject: {fileID: 1147857061656144}
   serializedVersion: 5
   lengthInSec: 0.5
   simulationSpeed: 2
@@ -308,7 +309,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 1150646550
+  randomSeed: -47443743
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -3516,13 +3517,13 @@ ParticleSystem:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
---- !u!199 &199634368945361030
+--- !u!199 &199236239609368464
 ParticleSystemRenderer:
   serializedVersion: 4
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1988356544883484}
+  m_GameObject: {fileID: 1147857061656144}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0

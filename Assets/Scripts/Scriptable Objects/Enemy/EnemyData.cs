@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "EnemyData", menuName = "Custom Enemy")]
+[CreateAssetMenu(fileName = "EnemyData", menuName = "EnemyData")]
 public class EnemyData : ScriptableObject
 {
     // ADD TO CONST?

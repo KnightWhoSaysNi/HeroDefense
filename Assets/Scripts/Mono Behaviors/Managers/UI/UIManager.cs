@@ -224,6 +224,9 @@ public class UIManager : Raycaster
         shouldShowCountdown = false;
         shouldShowMessage = false;
 
+        activeEnemy = null;
+        activePlaceable = null;
+
         if (shouldChangeTimeScale)
         {
             // Canvas fading won't allow changing the scene if time scale isn't 1

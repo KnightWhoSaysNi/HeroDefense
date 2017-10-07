@@ -198,11 +198,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyType: {fileID: 11400000, guid: e05159ad1f68df04baedcb06b6780e2f, type: 2}
   enemyData: {fileID: 11400000, guid: 3b48548cf1ec8e244ba641af8c95301d, type: 2}
-  moveAgent: {fileID: 0}
+  moveAgent: {fileID: 114766069959928798}
   otherRenderers:
   - {fileID: 23481092031334442}
   dieParticleEffect: {fileID: 198801087134912992}
   hitMaterial: {fileID: 2100000, guid: b2a62afff98018e459ccadb04ed2bde6, type: 2}
+  renderer: {fileID: 23863883400067578}
   minTimeInAttackedState: 0.25
 --- !u!114 &114766069959928798
 MonoBehaviour:

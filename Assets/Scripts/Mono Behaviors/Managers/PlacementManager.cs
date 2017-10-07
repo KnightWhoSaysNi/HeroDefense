@@ -36,6 +36,7 @@ public class PlacementManager : Raycaster
     private Vector3 zFightingOffset;
     private Vector3 placementPosition;
     private Vector3 lastPlacedPosition;
+    private Vector3 zeroVector;
     #endregion
 
     #region - Events -
@@ -117,6 +118,7 @@ public class PlacementManager : Raycaster
 
         base.Awake();
 
+        zeroVector = new Vector3(0, 0, 0);
         zFightingOffset = new Vector3(0.001f, 0.001f, 0.001f); 
     }
 
@@ -200,7 +202,6 @@ public class PlacementManager : Raycaster
             // A check to see if the active placeable is already placed. If it is not, use that instance, and if it is already placed then get a new one from the pool
             if (activePlaceable == null || activePlaceable.IsPlaced)
             {
-
                 activePlaceable = PlaceablePool.Instance.GetObject(placeables[placeableIndex].placeableType, placeableParent);
             }
 
@@ -293,6 +294,7 @@ public class PlacementManager : Raycaster
     {
         isInPlacementMode = false;
         placeableIndex = 0;
+        lastPlacedPosition = zeroVector;
 
         if (activePlaceable != null)
         {

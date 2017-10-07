@@ -1047,6 +1047,9 @@ MonoBehaviour:
   - pool: {fileID: 11400000, guid: df3f97171b08c184b9c64f99959b0fc3, type: 2}
     poolObject: {fileID: 114503007417218412, guid: 1634f53aee2ace44eaed894babbaea86,
       type: 2}
+  - pool: {fileID: 11400000, guid: 589fe4717c9e07c438e5bde553343e71, type: 2}
+    poolObject: {fileID: 114277782746763838, guid: 8f50e2131f283ca45a123d4f4e44e574,
+      type: 2}
 --- !u!4 &860434508
 Transform:
   m_ObjectHideFlags: 0

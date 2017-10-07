@@ -210,11 +210,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyType: {fileID: 11400000, guid: d46e9b09a0e564d45b45943ad33ed9d6, type: 2}
   enemyData: {fileID: 11400000, guid: 57abe83995b62c743ab8ae851f9d3f26, type: 2}
-  moveAgent: {fileID: 0}
+  moveAgent: {fileID: 114766069959928798}
   otherRenderers:
   - {fileID: 23481092031334442}
   dieParticleEffect: {fileID: 198333089188644746}
   hitMaterial: {fileID: 2100000, guid: 7477f646011b7804497479c38bac4249, type: 2}
+  renderer: {fileID: 23863883400067578}
   minTimeInAttackedState: 0.5
 --- !u!135 &135053591668473064
 SphereCollider:

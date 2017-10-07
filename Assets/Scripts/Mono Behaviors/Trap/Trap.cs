@@ -78,6 +78,8 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     {
         base.OnDisable();
         enemiesInRange.Clear();
+        hasWaitedForAttackHitDelay = false;
+        isWaitingForCooldown = false;
         currentEnemy = null;
     }
     #endregion    
@@ -392,7 +394,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
             // so the list of enemies in range is traversed to find a better target
             for (int i = 0; i < enemiesInRange.Count; i++)
             {
-                if (enemiesInRange[i].moveAgent.DistanceToTarget < currentEnemy.moveAgent.DistanceToTarget)
+                if (enemiesInRange[i].MoveAgent.DistanceToTarget < currentEnemy.MoveAgent.DistanceToTarget)
                 {
                     currentEnemy = enemiesInRange[i];
                 }

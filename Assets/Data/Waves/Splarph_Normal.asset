@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41fec79ee8d60014bbc90823961232ef, type: 3}
+  m_Name: Splarph_Normal
+  m_EditorClassIdentifier: 
+  startDelay: 10
+  endDelay: 0
+  shouldRandomizeEnemies: 0
+  spawnRate: 0
+  waveElements:
+  - enemy: {fileID: 114277782746763838, guid: 8f50e2131f283ca45a123d4f4e44e574, type: 2}
+    minNumberOfEnemies: 10
+    maxNumberOfEnemies: 25
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 0
+  - enemy: {fileID: 114277782746763838, guid: 8f50e2131f283ca45a123d4f4e44e574, type: 2}
+    minNumberOfEnemies: 5
+    maxNumberOfEnemies: 25
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 0.15
+  - enemy: {fileID: 114277782746763838, guid: 8f50e2131f283ca45a123d4f4e44e574, type: 2}
+    minNumberOfEnemies: 20
+    maxNumberOfEnemies: 27
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 0
+  - enemy: {fileID: 114277782746763838, guid: 8f50e2131f283ca45a123d4f4e44e574, type: 2}
+    minNumberOfEnemies: 7
+    maxNumberOfEnemies: 21
+    chanceOfAppearing: 1
+    additionalSpawnDelay: 0.2

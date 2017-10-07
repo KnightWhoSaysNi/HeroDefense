@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Name: Test
   m_EditorClassIdentifier: 
   levelElements:
+  - wave: {fileID: 11400000, guid: fe08ac5ab7ef6714fbadc6cf3e82bfd1, type: 2}
+    waveCount: 1
   - wave: {fileID: 11400000, guid: 46695b159d41c60468693a1e5a0b55fb, type: 2}
     waveCount: 1
   - wave: {fileID: 11400000, guid: a77e75e8c2ddfbb4391b600c56f7e8a6, type: 2}
@@ -20,5 +22,5 @@ MonoBehaviour:
     waveCount: 1
   - wave: {fileID: 11400000, guid: 32da4e08fb0490a4d87eff3be50767ee, type: 2}
     waveCount: 1
-  startEnergy: 1
-  startGold: 0
+  startEnergy: 20
+  startGold: 750
