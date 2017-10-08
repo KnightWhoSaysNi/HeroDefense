@@ -13,7 +13,9 @@ public class Player : MonoBehaviour
     private int experience;
     private int level;
 
-    public event Action LevelUp;
+    public static event Action LevelGained;
+    public static event Action ExperienceGained;
+    public static event Action GoldGained;
 
     public int Gold
     {
@@ -30,7 +32,7 @@ public class Player : MonoBehaviour
                 gold = 0;
             }
 
-            UIManager.Instance.UpdatePlayerGold();
+            GoldGained?.Invoke();
         }
     }
     public int Experience
@@ -53,7 +55,7 @@ public class Player : MonoBehaviour
                 Level++;
             }
 
-            UIManager.Instance.UpdatePlayerExperience();
+            ExperienceGained?.Invoke();
         }
     }
     public int Level
@@ -71,8 +73,7 @@ public class Player : MonoBehaviour
                 level = 1;
             }
 
-            LevelUp?.Invoke();
-            UIManager.Instance.UpdatePlayerLevel();
+            LevelGained?.Invoke();
         }
     }
     public int NextLevelExperience

@@ -13,7 +13,7 @@ public class EnemyDestroyer : MonoBehaviour
     {
         if (other.CompareTag(Constants.EnemyTag)) 
         {
-            Enemy enemy = other.GetComponent<Enemy>();
+            Enemy enemy = other.GetComponentInParent<Enemy>();
 
             if (enemy == null)
             {

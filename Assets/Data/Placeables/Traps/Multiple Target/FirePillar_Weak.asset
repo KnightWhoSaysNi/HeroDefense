@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e562437299130041a31694e50c55a07, type: 3}
   m_Name: FirePillar_Weak
   m_EditorClassIdentifier: 
-  damage: 7
+  damage: 15
   attackCooldown: 0
   targetingSystem: 1
   damageType: 0

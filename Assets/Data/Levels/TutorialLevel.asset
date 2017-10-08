@@ -13,7 +13,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelElements:
   - wave: {fileID: 11400000, guid: 9a6fa113d36905341ae3817411df2e74, type: 2}
-    waveCount: 2
+    waveCount: 1
+  - wave: {fileID: 11400000, guid: b88485377e4a0bf4295035f9be391b6d, type: 2}
+    waveCount: 1
+  - wave: {fileID: 11400000, guid: 9a6fa113d36905341ae3817411df2e74, type: 2}
+    waveCount: 1
   - wave: {fileID: 11400000, guid: fe08ac5ab7ef6714fbadc6cf3e82bfd1, type: 2}
     waveCount: 1
   - wave: {fileID: 11400000, guid: 9fdd7cdd158df044ca3d80b4c17c6536, type: 2}
@@ -27,6 +31,10 @@ MonoBehaviour:
   - wave: {fileID: 11400000, guid: 0745dd5207b354f408a60b637874905a, type: 2}
     waveCount: 2
   - wave: {fileID: 11400000, guid: 9f05582c326412240baceb7b90e88918, type: 2}
+    waveCount: 1
+  - wave: {fileID: 11400000, guid: b88485377e4a0bf4295035f9be391b6d, type: 2}
+    waveCount: 1
+  - wave: {fileID: 11400000, guid: fe08ac5ab7ef6714fbadc6cf3e82bfd1, type: 2}
     waveCount: 1
   - wave: {fileID: 11400000, guid: 2a6106a50eed30844844e113e6142a76, type: 2}
     waveCount: 1

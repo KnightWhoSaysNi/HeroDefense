@@ -40,8 +40,10 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     protected List<Enemy> affectedEnemies;
     protected Collider[] aoeColliders;
     protected Enemy currentEnemy;
+    protected Enemy currentTarget;
     protected Coroutine attackCoroutine;
     protected bool isObstructed;
+    protected int enemyInRangeIndex;
 
     protected Animator animator;
     #endregion
@@ -54,7 +56,22 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
             return goldCost;
         }
     }
-    #endregion
+    public bool IsObstructed
+    {
+        get
+        {
+            return isObstructed;
+        }
+        set
+        {
+            if (isObstructed != value)
+            {
+                isObstructed = value;
+                OnObstructionChanged();
+            }
+        }
+    }
+    #endregion    
 
     #region - MonoBehavior methods -
     protected new void Awake()
@@ -80,6 +97,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
         enemiesInRange.Clear();
         hasWaitedForAttackHitDelay = false;
         isWaitingForCooldown = false;
+        IsObstructed = true;
         currentEnemy = null;
     }
     #endregion    
@@ -165,9 +183,6 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
                     yield return null;
                     CheckIfObstructed();
                 }
-
-                // Setting it back to true for the next frame or attack iteration
-                isObstructed = true;
             }
 
             if (state != TrapState.AttackState)
@@ -231,26 +246,49 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
             return;
         }
 
-        RaycastHit hit;
-        if (Physics.Raycast(attackPosition.position, currentEnemy.transform.position - attackPosition.position, out hit, 100f, obstructionLayerMask)) // ADD TO CONST?
+        currentTarget = currentEnemy;
+        enemyInRangeIndex = 0;
+
+        // First check if the current enemy is obstructed or not, and if it is then do the same for all other enemies in range and update the new current enemy if necessary
+        do
         {
-            if (((1 << hit.transform.gameObject.layer) & trapAttackArea.enemyLayerMask) != 0)
+            RaycastHit hit;
+            if (Physics.Raycast(attackPosition.position, currentTarget.HitTarget.position - attackPosition.position, out hit, 100f, obstructionLayerMask)) // ADD TO CONST?
             {
-                // Enemy was hit with the ray, meaning nothing is obstructing the attack
-                isObstructed = false;
+                if (((1 << hit.transform.gameObject.layer) & trapAttackArea.enemyLayerMask) != 0)
+                {
+                    // Enemy was hit with the ray, meaning nothing is obstructing the attack               
+                    IsObstructed = false;
+
+                    // Current enemy might have been obstructed and the next non-obstructed enemy is the new 'current enemy'
+                    currentEnemy = currentTarget;
+                    break;
+                }
+                else
+                {
+                    // Enemy was not hit with the ray, meaning something is obstructing the attack
+                    IsObstructed = true;
+
+                    // Get the next enemy in range and check if it is obstructed or not
+                    currentTarget = enemiesInRange[enemyInRangeIndex];
+                    enemyInRangeIndex++;
+                }
             }
             else
             {
-                // Enemy was not hit with the ray, meaning something is obstructing the attack
-                isObstructed = true;
+                // Nothing was hit with the ray. This shouldn't ever happen, but it's here just in case
+                print("Ray from trap to the current enemy didn't hit anything!");
             }
-        }
-        else
-        {
-            // Nothing was hit with the ray. This shouldn't ever happen, but it's here just in case
-            print("Ray from trap to the current enemy didn't hit anything!");
-        }
+        } while (enemyInRangeIndex < enemiesInRange.Count);
 
+    }
+
+    protected virtual void OnObstructionChanged()
+    {
+        if (isObstructed && state == TrapState.AttackState)
+        {
+            GoToNormalState();
+        }        
     }
 
     /// <summary>
@@ -323,9 +361,9 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
 
         for (int i = 0; i < numberOfColliders; i++)
         {
-            Enemy affectedEnemy = aoeColliders[i].GetComponent<Enemy>();
+            Enemy affectedEnemy = aoeColliders[i].GetComponentInParent<Enemy>();
 
-            if (affectedEnemy != null) // TODO if affected enemy is not dead, there should be no need for a null check if the layer maks is set up correctly
+            if (affectedEnemy != null) // TODO if affected enemy is not dead, there should be no need for a null check if the layer mask is set up correctly
             {
                 affectedEnemies.Add(affectedEnemy);
             }

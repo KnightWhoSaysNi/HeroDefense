@@ -13,6 +13,7 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
 
     // Level specific fields
     private Level currentLevel;
+    private int totalWaveCount;   
     private int currentEnergy;
     private bool canStartLevel;
     private bool isLevelOngoing;
@@ -59,7 +60,23 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
 
             UIManager.Instance.UpdateEnergyInfo(currentEnergy, currentLevel.startEnergy);
         }
-    }    
+    }
+    public int TotalWaveCount
+    {
+        get
+        {
+            if (totalWaveCount == 0)
+            {
+                // First time calling this property
+                for (int i = 0; i < currentLevel.levelElements.Count; i++)
+                {
+                    totalWaveCount += currentLevel.levelElements[i].waveCount;
+                }
+            }
+
+            return totalWaveCount;
+        }
+    }
 
     #region - "Singleton" Instance -
     private static LevelManager instance;
@@ -118,8 +135,8 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
         isLevelOngoing = false;
         StopAllCoroutines();
 
-        PlaceablePool.Instance.ReclaimAllObjects();
-        EnemyPool.Instance.ReclaimAllObjects();
+        //PlaceablePool.Instance.ReclaimAllObjects();
+        //EnemyPool.Instance.ReclaimAllObjects();
         ResetLevel();
 
         LevelRestarted?.Invoke();
@@ -176,13 +193,14 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
     {
         numberOfAliveEnemies = 0;
         waveOrdinalNumber = 0;
+        totalWaveCount = 0;
         isLevelOngoing = false;
         haveAllWavesSpawned = false;
 
         currentEnergy = currentLevel.startEnergy;
         Player.Instance.Gold = currentLevel.startGold;
                 
-        UIManager.Instance.UpdateWaveInfo(0, currentLevel.TotalWaveCount);
+        UIManager.Instance.UpdateWaveInfo(0, TotalWaveCount);
         UIManager.Instance.UpdateEnergyInfo(currentEnergy, currentLevel.startEnergy);
 
         SetUpPlayerBearings();
@@ -247,27 +265,27 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
         {
             currentWave = currentLevel.levelElements[i].wave;
 
-            // Check if wave has start delay
-            if (currentWave.startDelay > 0)
-            {
-                hasStartDelay = true;
+            // Set start delay if the wave has it
+            hasStartDelay = currentWave.startDelay > 0;
+            if (hasStartDelay)
+            {                
                 waveStartDelay = new WaitForSeconds(currentWave.startDelay);
             }
 
-            // Check if wave has end delay
-            if (currentWave.endDelay > 0)
+            // Set end delay if the wave has it
+            hasEndDelay = currentWave.endDelay > 0;
+            if (hasEndDelay)
             {
-                hasEndDelay = true;
                 waveEndDelay = new WaitForSeconds(currentWave.endDelay);
-            }
+            }            
 
             // Repeat playing the wave waveCount times
             for (int j = 0; j < currentLevel.levelElements[i].waveCount; j++)
             {
                 // Let UIManager update the wave information
                 waveOrdinalNumber++;
-                bool isFinalWave = waveOrdinalNumber == currentLevel.TotalWaveCount;
-                UIManager.Instance.UpdateWaveInfo(waveOrdinalNumber, currentLevel.TotalWaveCount);
+                bool isFinalWave = waveOrdinalNumber == TotalWaveCount;
+                UIManager.Instance.UpdateWaveInfo(waveOrdinalNumber, TotalWaveCount);
                 UIManager.Instance.ShowCountdown(currentWave.startDelay, isFinalWave);
 
                 // Wave start delay

@@ -1033,22 +1033,25 @@ MonoBehaviour:
   enemyStartCount: 2
   enemyPools:
   - pool: {fileID: 11400000, guid: e05159ad1f68df04baedcb06b6780e2f, type: 2}
-    poolObject: {fileID: 114503007417218412, guid: f6daf9ed435cefb4882d58b0161e1c42,
+    poolObject: {fileID: 114836532198107388, guid: f6daf9ed435cefb4882d58b0161e1c42,
       type: 2}
   - pool: {fileID: 11400000, guid: d46e9b09a0e564d45b45943ad33ed9d6, type: 2}
-    poolObject: {fileID: 114970115917398916, guid: a70d7498fe25911438cc287c14f07888,
+    poolObject: {fileID: 114119218108967574, guid: a70d7498fe25911438cc287c14f07888,
       type: 2}
   - pool: {fileID: 11400000, guid: d9aa820d27fcfeb4bbf296c7a7b6df1d, type: 2}
-    poolObject: {fileID: 114503007417218412, guid: 806d5b9165719b64f91a24f7464e9f66,
+    poolObject: {fileID: 114610353834616002, guid: 806d5b9165719b64f91a24f7464e9f66,
       type: 2}
   - pool: {fileID: 11400000, guid: 30eb90c9e35bc9d41a81847ad265951f, type: 2}
-    poolObject: {fileID: 114970115917398916, guid: f49a38cb3709d8547a6cf5af8d7b500c,
+    poolObject: {fileID: 114070707524040096, guid: f49a38cb3709d8547a6cf5af8d7b500c,
       type: 2}
   - pool: {fileID: 11400000, guid: df3f97171b08c184b9c64f99959b0fc3, type: 2}
-    poolObject: {fileID: 114503007417218412, guid: 1634f53aee2ace44eaed894babbaea86,
+    poolObject: {fileID: 114545868839923606, guid: 1634f53aee2ace44eaed894babbaea86,
       type: 2}
   - pool: {fileID: 11400000, guid: 589fe4717c9e07c438e5bde553343e71, type: 2}
     poolObject: {fileID: 114277782746763838, guid: 8f50e2131f283ca45a123d4f4e44e574,
+      type: 2}
+  - pool: {fileID: 11400000, guid: aff6610c65a9acb4e87f9852c6cf03eb, type: 2}
+    poolObject: {fileID: 114350796981441836, guid: 92cede349c248bd46867bb6c0da9f7ea,
       type: 2}
 --- !u!4 &860434508
 Transform:

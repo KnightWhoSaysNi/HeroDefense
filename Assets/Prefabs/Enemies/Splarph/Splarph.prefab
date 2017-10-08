@@ -21,8 +21,8 @@ GameObject:
   - component: {fileID: 4784626308422998}
   - component: {fileID: 198113279649015384}
   - component: {fileID: 199811140424024172}
-  m_Layer: 9
-  m_Name: EnemyDieEffect
+  m_Layer: 0
+  m_Name: DieEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36,13 +36,12 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4901686262641864}
-  - component: {fileID: 135116831292541082}
   - component: {fileID: 195044337035275394}
   - component: {fileID: 114110121592146680}
   - component: {fileID: 114277782746763838}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Splarph
-  m_TagString: Enemy
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -58,9 +57,10 @@ GameObject:
   - component: {fileID: 33640389560475982}
   - component: {fileID: 23543999780848718}
   - component: {fileID: 95277529835593354}
-  m_Layer: 0
-  m_Name: Splarph
-  m_TagString: Untagged
+  - component: {fileID: 135901878385219608}
+  m_Layer: 9
+  m_Name: SplarphModel
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -99,7 +99,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1471505904178230}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 9.547922, y: 0, z: -9.180032}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4334894569090266}
@@ -188,23 +188,25 @@ MonoBehaviour:
   enemyType: {fileID: 11400000, guid: 589fe4717c9e07c438e5bde553343e71, type: 2}
   enemyData: {fileID: 11400000, guid: aef933eb75eb4de45ace85a709314acd, type: 2}
   moveAgent: {fileID: 114110121592146680}
+  hitTarget: {fileID: 4334894569090266}
   otherRenderers: []
   dieParticleEffect: {fileID: 198113279649015384}
   hitMaterial: {fileID: 2100000, guid: caaf1504cd0483f40a41755f6eda5d4c, type: 2}
   renderer: {fileID: 23543999780848718}
   minTimeInAttackedState: 0.25
---- !u!135 &135116831292541082
+  collider: {fileID: 135901878385219608}
+--- !u!135 &135901878385219608
 SphereCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1471505904178230}
+  m_GameObject: {fileID: 1598558861040724}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Radius: 0.8
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!195 &195044337035275394
 NavMeshAgent:
   m_ObjectHideFlags: 1
@@ -285,7 +287,7 @@ ParticleSystem:
   moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -552637972
+  randomSeed: 1172552570
   InitialModule:
     serializedVersion: 3
     enabled: 1

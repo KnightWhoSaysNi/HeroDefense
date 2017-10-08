@@ -64,7 +64,12 @@ public class PlaceablePool : PoolBase<PlaceableType, Placeable>
         {
             ExpandPool(placeablePools[i].pool, placeableStartCount);
         }
-    }    
+    }
+
+    private new void Update()
+    {
+        base.Update();
+    }
 }
 
 

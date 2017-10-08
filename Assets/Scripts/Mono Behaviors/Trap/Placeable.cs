@@ -118,6 +118,31 @@ public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom 
         OnSold();
         // OnDisable will be called after this method as the game object will be deactivated
     }
+
+    public void CheckPlacementValidity()
+    {
+        if (numberOfCollidedPlaceables == 0 && currentlyCollidedObjects.Count == 1 && Player.Instance.Gold >= goldCost)
+        {
+            // Placement is legal
+            isInIllegalState = false;
+            for (int i = 0; i < countOfRenderers; i++)
+            {
+                renderers[i].material = transparentMaterials[i];
+            }
+        }
+        else
+        {
+            // Placement is illegal
+            if (!isInIllegalState)
+            {
+                isInIllegalState = true;
+                for (int i = 0; i < countOfRenderers; i++)
+                {
+                    renderers[i].material = illegalPlacementMaterial;
+                }
+            }
+        }
+    }
     #endregion
 
     #region - MonoBehavior methods -
@@ -140,40 +165,33 @@ public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom 
 
     protected void Start()
     {
-        // Used if the placeable was placed in editor
-        if (isPlaced)
-        {
-            IsPlaced = true;
-        }
+            
     }
 
     protected virtual void OnDisable()
-    {
+    {        
         IsPlaced = false;
         isInIllegalState = false;
         numberOfCollidedPlaceables = 0;
         currentlyCollidedObjects.Clear();
-        rangeVisual.SetActive(true);
+        //rangeVisual.SetActive(true);
     } 
     #endregion
 
     #region - IPoolable interface methods -
-    // OnDisable is used for post-deactivation. Pre/post-activation and pre-deactivation are not needed for base placeable
     public virtual void PreActivation(System.Object data)
     {
-
+        rangeVisual.SetActive(true);
     }
     public virtual void PostActivation(System.Object data)
     {
-
     }
     public virtual void PreDeactivation()
     {
 
     }
     public virtual void PostDeactivation()
-    {
-
+    {       
     }
     #endregion
 
@@ -205,7 +223,6 @@ public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom 
         }
         else if (!other.CompareTag(Constants.EnemyTag)) 
         {
-
             currentlyCollidedObjects.Add(other.gameObject);
             CheckPlacementValidity();
         }
@@ -228,31 +245,6 @@ public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom 
             currentlyCollidedObjects.Remove(other.gameObject);
             CheckPlacementValidity();
         }
-    }
-
-    private void CheckPlacementValidity()
-    {
-        if (numberOfCollidedPlaceables == 0 && currentlyCollidedObjects.Count == 1 && Player.Instance.Gold >= goldCost)
-        {
-            // Placement is legal
-            isInIllegalState = false;
-            for (int i = 0; i < countOfRenderers; i++)
-            {
-                renderers[i].material = transparentMaterials[i];
-            }
-        }
-        else
-        {
-            // Placement is illegal
-            if (!isInIllegalState)
-            {
-                isInIllegalState = true;
-                for (int i = 0; i < countOfRenderers; i++)
-                {
-                    renderers[i].material = illegalPlacementMaterial;
-                }
-            }
-        }
-    } 
+    }    
     #endregion
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 public class EnemyData : ScriptableObject
 {
     // ADD TO CONST?
-    [Range(0, 1000)] public float maxHealth;
+    [Range(0, 5000)] public float maxHealth;
     [Range(0, 100)] public float movementSpeed;
     [Range(0, 1000)] public int energyDrain;
     [Range(0, 1000)] public int armor;

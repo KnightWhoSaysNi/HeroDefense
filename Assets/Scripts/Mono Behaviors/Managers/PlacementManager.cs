@@ -36,7 +36,7 @@ public class PlacementManager : Raycaster
     private Vector3 zFightingOffset;
     private Vector3 placementPosition;
     private Vector3 lastPlacedPosition;
-    private Vector3 zeroVector;
+    private Vector3 zeroVector; 
     #endregion
 
     #region - Events -
@@ -78,8 +78,7 @@ public class PlacementManager : Raycaster
     {
         get
         {
-            canBePlaced =
-                Input.GetButtonDown("Fire1") &&
+            canBePlaced =                
                 Player.Instance.Gold >= activePlaceable.GoldCost &&
                 placementPosition != lastPlacedPosition &&
                 activePlaceable.CanBePlaced;
@@ -126,6 +125,7 @@ public class PlacementManager : Raycaster
     {
         SceneManager.sceneLoaded += (loadedScene, loadSceneMode) => ResetPlacement();
         LevelManager.LevelRestarted += ResetPlacement;
+        Player.GoldGained += OnPlayerGoldGained;
     }
 
     private void Update()
@@ -217,7 +217,7 @@ public class PlacementManager : Raycaster
                 UpdateActivePlaceableTransform();
                 CheckForRotation();
 
-                if (CanBePlaced)
+                if (Input.GetButtonDown("Fire1") && CanBePlaced)
                 {
                     PlacePlaceable();
                 }
@@ -294,13 +294,16 @@ public class PlacementManager : Raycaster
     {
         isInPlacementMode = false;
         placeableIndex = 0;
-        lastPlacedPosition = zeroVector;
+        lastPlacedPosition = zeroVector;       
+        activePlaceable = null;        
+    } 
 
+    private void OnPlayerGoldGained()
+    {
         if (activePlaceable != null)
         {
-            PlaceablePool.Instance.ReclaimObject(activePlaceable.placeableType, activePlaceable);
-            activePlaceable = null;
+            activePlaceable.CheckPlacementValidity();
         }
-    } 
+    }
     #endregion
 }

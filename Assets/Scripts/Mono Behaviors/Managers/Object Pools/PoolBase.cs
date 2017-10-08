@@ -141,7 +141,7 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
     }
     
     protected virtual void Update()
-    {
+    {        
         if (isThresholdReached)
         {
             isThresholdReached = false;

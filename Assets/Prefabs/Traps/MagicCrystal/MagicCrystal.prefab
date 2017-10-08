@@ -524,7 +524,7 @@ MonoBehaviour:
   attackHitDelay: 0
   obstructionLayerMask:
     serializedVersion: 2
-    m_Bits: 4294960127
+    m_Bits: 4294960091
   trapAttackArea: {fileID: 114947936901005694}
   canAttackBeObstructed: 1
   attackPosition: {fileID: 4429301319882678}
@@ -700,7 +700,7 @@ ParticleSystem:
   moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: -1968293589
+  randomSeed: 1750487779
   InitialModule:
     serializedVersion: 3
     enabled: 1

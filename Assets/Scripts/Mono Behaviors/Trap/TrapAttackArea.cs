@@ -45,7 +45,8 @@ public class TrapAttackArea : MonoBehaviour
     {
         if (other.CompareTag(Constants.EnemyTag)) 
         {
-            Enemy enemy = other.gameObject.GetComponent<Enemy>();
+            Enemy enemy = other.gameObject.GetComponentInParent<Enemy>();
+
             // TODO The second check shouldn't really be necessary (dead enemies shouldn't move any more). Unless the trap itself moves
             if (enemy != null && !enemy.IsDead)  
             {

@@ -22,13 +22,24 @@ public class LightBeamTrap : Trap
     }
 
     private void Update()
-    {
-        if (state == TrapState.AttackState)
+    {        
+        if (state == TrapState.AttackState && currentEnemy != null)
         {
-            if (currentEnemy != null)
-            {                
-                beam.SetPosition(1, currentEnemy.transform.position);
-            }
+            beam.SetPosition(1, currentEnemy.HitTarget.position);
+        }
+    }
+
+    protected override void OnObstructionChanged()
+    {
+        base.OnObstructionChanged();
+
+        if (isObstructed)
+        {
+            beam.enabled = false;
+        }
+        else
+        {
+            beam.enabled = true;
         }
     }
 
@@ -42,7 +53,18 @@ public class LightBeamTrap : Trap
     protected override void OnSold()
     {
         base.OnSold();
+    }
 
+    protected override void GoToAttackState()
+    {
+        base.GoToAttackState();
+        beam.SetPosition(1, currentEnemy.HitTarget.position);
+        beam.enabled = true;
+    }
 
+    protected override void GoToNormalState()
+    {
+        base.GoToNormalState();
+        beam.enabled = false;
     }
 }

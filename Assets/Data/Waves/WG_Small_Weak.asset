@@ -16,12 +16,12 @@ MonoBehaviour:
   shouldRandomizeEnemies: 0
   spawnRate: 0.15
   waveElements:
-  - enemy: {fileID: 114503007417218412, guid: f6daf9ed435cefb4882d58b0161e1c42, type: 2}
+  - enemy: {fileID: 114836532198107388, guid: f6daf9ed435cefb4882d58b0161e1c42, type: 2}
     minNumberOfEnemies: 10
     maxNumberOfEnemies: 15
     chanceOfAppearing: 1
     additionalSpawnDelay: 0
-  - enemy: {fileID: 114970115917398916, guid: a70d7498fe25911438cc287c14f07888, type: 2}
+  - enemy: {fileID: 114119218108967574, guid: a70d7498fe25911438cc287c14f07888, type: 2}
     minNumberOfEnemies: 5
     maxNumberOfEnemies: 10
     chanceOfAppearing: 1

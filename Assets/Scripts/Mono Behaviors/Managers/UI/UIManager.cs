@@ -242,18 +242,18 @@ public class UIManager : Raycaster
         UpdatePlayerGold();
     }
 
-    public void UpdatePlayerLevel()
+    private void UpdatePlayerLevel()
     {
         gameplayUIData.playerLevel.text = player.Level.ToString();
     }
 
-    public void UpdatePlayerExperience()
+    private void UpdatePlayerExperience()
     {
         gameplayUIData.playerExperience.text = player.Experience + "/" + player.NextLevelExperience;
         gameplayUIData.playerExperienceBar.value = (float)player.Experience / player.NextLevelExperience;
     }
 
-    public void UpdatePlayerGold()
+    private void UpdatePlayerGold()
     {
         if (gameplayUIData != null)
         {
@@ -349,7 +349,7 @@ public class UIManager : Raycaster
     /// </summary>
     private void UpdateEnemyHealth(float currentHealth, float maxHealth)
     {
-        gameplayUIData.enemyHealth.text = (int)currentHealth + "/" + (int)maxHealth;
+        gameplayUIData.enemyHealth.text = Mathf.Ceil(currentHealth) + "/" + (int)maxHealth;
         gameplayUIData.enemyHealthBar.value = currentHealth / maxHealth;
     }
 
@@ -491,6 +491,9 @@ public class UIManager : Raycaster
         PlacementManager.PlacementModeChanged += OnPlacementModeChanged;
         LevelManager.PlayerWon += () => OnGameEnd(true);
         LevelManager.PlayerLost += () => OnGameEnd(false);
+        Player.LevelGained += UpdatePlayerLevel;
+        Player.ExperienceGained += UpdatePlayerExperience;
+        Player.GoldGained += UpdatePlayerGold;
     }
 
     private void Update()
@@ -599,7 +602,7 @@ public class UIManager : Raycaster
             gameplayUIData.placeableCanvas.SetActive(false);
         }
 
-        activeEnemy = raycastHit.transform.GetComponent<Enemy>();
+        activeEnemy = raycastHit.transform.GetComponentInParent<Enemy>();
 
         if (activeEnemy == null)
         {

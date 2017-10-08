@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(MoveAgent))]
 public class Enemy : MonoBehaviour, IPoolable // Refactor
 {
@@ -11,6 +10,7 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
     [SerializeField] protected EnemyData enemyData;
     [SerializeField] protected MoveAgent moveAgent;
     [Space(5)]
+    [SerializeField] protected Transform hitTarget;
     [SerializeField] protected Renderer[] otherRenderers;
     [SerializeField] protected ParticleSystem dieParticleEffect;
     [SerializeField] protected Material hitMaterial;
@@ -27,7 +27,7 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
     protected bool isHit;
     protected bool isDead;
 
-    protected new Collider collider;
+    [SerializeField] protected new Collider collider;
     protected Transform myTransform;
     #endregion
 
@@ -49,6 +49,13 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
         get
         {
             return moveAgent;
+        }
+    }
+    public Transform HitTarget
+    {
+        get
+        {
+            return hitTarget;
         }
     }
 
@@ -143,14 +150,14 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
     protected virtual void Awake()
     {
         state = EnemyState.NormalState;
-
-        collider = GetComponent<Collider>();        
+      
         myTransform = this.transform;
     }
 
     protected virtual void Start()
     {
         originalMaterial = renderer.sharedMaterial;
+        moveAgent.agent.speed = enemyData.movementSpeed;
     }
 
     protected virtual void Update()
@@ -177,6 +184,7 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
     #region - IPoolable interface implementation -
     public virtual void PreActivation(System.Object preActivationData)
     {
+        //isDead = false;
         myTransform.position = myTransform.parent.position;
         myTransform.rotation = myTransform.parent.rotation;
     }

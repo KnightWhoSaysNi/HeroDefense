@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdea55109b42e7d49a91441572ec9c16, type: 3}
   m_Name: OrangeEnemy
   m_EditorClassIdentifier: 
-  maxHealth: 1000
+  maxHealth: 5000
   movementSpeed: 2
   energyDrain: 5
   armor: 15
