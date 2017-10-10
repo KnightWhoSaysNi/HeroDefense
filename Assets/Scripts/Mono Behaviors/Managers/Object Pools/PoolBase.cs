@@ -11,7 +11,6 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
     /// <summary>
     /// All different prefabs for which object pools are created.
     /// </summary>
-    [Tooltip("All different prefabs for which you wish to make an object pool. NO DUPLICATES ALLOWED, WILL THROW EXCEPTION!")]
     protected Dictionary<TPool, TPoolObject> allPools;
     /// <summary>
     /// Minimum count of objects a pool can have at which point it must expand and instantiate new objects.

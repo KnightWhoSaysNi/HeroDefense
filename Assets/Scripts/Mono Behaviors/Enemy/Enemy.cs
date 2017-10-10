@@ -184,7 +184,8 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
     #region - IPoolable interface implementation -
     public virtual void PreActivation(System.Object preActivationData)
     {
-        //isDead = false;
+        isDead = false;
+        UpdateRenderers();
         myTransform.position = myTransform.parent.position;
         myTransform.rotation = myTransform.parent.rotation;
     }
@@ -208,15 +209,12 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
         {
             GoToNormalState();
         }
-
-        isDead = false;
+        
         isHit = false;
         currentHealth = enemyData.maxHealth;
         hitTimer = -1;
         // TODO Change this if there is a death animation, not just the particle effect
-        deathTimer = dieParticleEffect.main.duration;
-
-        UpdateRenderers();
+        deathTimer = dieParticleEffect.main.duration;        
     }
     #endregion
 
