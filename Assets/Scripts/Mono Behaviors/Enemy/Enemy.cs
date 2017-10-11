@@ -162,10 +162,6 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
 
     protected virtual void Update()
     {
-        if (!isDead)
-        {
-            UpdateState();
-        }
 
         if (isDead && deathTimer >= 0)
         {
@@ -174,7 +170,7 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
             if (deathTimer <= 0)
             {
                 // Return to the pool
-                EnemyPool.Instance.ReclaimObject(enemyType, this);
+                EnemyPool.Instance.ReclaimObject(this);
             }
         }
     }
@@ -182,14 +178,14 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
     #endregion
 
     #region - IPoolable interface implementation -
-    public virtual void PreActivation(System.Object preActivationData)
+    public virtual void DoPreActivation(System.Object preActivationData)
     {
         isDead = false;
         UpdateRenderers();
         myTransform.position = myTransform.parent.position;
         myTransform.rotation = myTransform.parent.rotation;
     }
-    public virtual void PostActivation(System.Object postActivationData)
+    public virtual void DoPostActivation(System.Object postActivationData)
     {
         moveAgent.agent.enabled = true;
         if (postActivationData != null)
@@ -199,11 +195,11 @@ public class Enemy : MonoBehaviour, IPoolable // Refactor
         }
         
     }
-    public virtual void PreDeactivation()
+    public virtual void DoPreDeactivation()
     {
         moveAgent.agent.enabled = false;
     }
-    public virtual void PostDeactivation()
+    public virtual void DoPostDeactivation()
     {
         if (state != EnemyState.NormalState)
         {

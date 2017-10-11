@@ -9,7 +9,8 @@ using UnityEngine.Rendering;
 public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom editor | Refactor
 {
     #region - Fields -    
-    public PlaceableType placeableType;
+    [SerializeField]
+    protected PlaceableType placeableType;
     public GameObject rangeVisual;
 
     [SerializeField]
@@ -41,6 +42,13 @@ public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom 
     #endregion
 
     #region - Properties -
+    public PlaceableType PlaceableType
+    {
+        get
+        {
+            return placeableType;
+        }
+    }
     public float PlacementOffsetMultiplier
     {
         get
@@ -179,18 +187,18 @@ public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom 
     #endregion
 
     #region - IPoolable interface methods -
-    public virtual void PreActivation(System.Object data)
+    public virtual void DoPreActivation(System.Object data)
     {
         rangeVisual.SetActive(true);
     }
-    public virtual void PostActivation(System.Object data)
+    public virtual void DoPostActivation(System.Object data)
     {
     }
-    public virtual void PreDeactivation()
+    public virtual void DoPreDeactivation()
     {
 
     }
-    public virtual void PostDeactivation()
+    public virtual void DoPostDeactivation()
     {       
     }
     #endregion

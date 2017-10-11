@@ -106,7 +106,7 @@ public class PlacementManager : Raycaster
         Player.Instance.Gold += GetSellPrice(placeableToSell);
 
         // Return to the pool
-        PlaceablePool.Instance.ReclaimObject(placeableToSell.placeableType, placeableToSell);
+        PlaceablePool.Instance.ReclaimObject(placeableToSell);
     }
     #endregion
 
@@ -165,7 +165,7 @@ public class PlacementManager : Raycaster
 
             if (activePlaceable != null)
             {
-                PlaceablePool.Instance.ReclaimObject(activePlaceable.placeableType, activePlaceable);
+                PlaceablePool.Instance.ReclaimObject(activePlaceable);
                 activePlaceable = null;
             }
 
@@ -202,7 +202,7 @@ public class PlacementManager : Raycaster
             // A check to see if the active placeable is already placed. If it is not, use that instance, and if it is already placed then get a new one from the pool
             if (activePlaceable == null || activePlaceable.IsPlaced)
             {
-                activePlaceable = PlaceablePool.Instance.GetObject(placeables[placeableIndex].placeableType, placeableParent);
+                activePlaceable = PlaceablePool.Instance.GetObject(placeables[placeableIndex].PlaceableType, placeableParent);
             }
 
             // Active placeable is not null at this point and is on an instantiated game object

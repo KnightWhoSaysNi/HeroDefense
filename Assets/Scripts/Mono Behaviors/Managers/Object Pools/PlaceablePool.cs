@@ -41,6 +41,14 @@ public class PlaceablePool : PoolBase<PlaceableType, Placeable>
     }
     #endregion
 
+    /// <summary>
+    /// Return the specified placeable to its pool.
+    /// </summary>
+    public override void ReclaimObject(Placeable placeableToReclaim)
+    {
+        base.ReclaimObject(placeableToReclaim.PlaceableType, placeableToReclaim, true);
+    }
+
     protected override void Awake()
     {
         InitializeSingleton();
@@ -64,12 +72,7 @@ public class PlaceablePool : PoolBase<PlaceableType, Placeable>
         {
             ExpandPool(placeablePools[i].pool, placeableStartCount);
         }
-    }
-
-    private new void Update()
-    {
-        base.Update();
-    }
+    }    
 }
 
 

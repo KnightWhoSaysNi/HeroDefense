@@ -6,14 +6,20 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    #region - Fields -
     public Camera playerCamera;
     public UnityStandardAssets.Characters.FirstPerson.FirstPersonController playerController;
-    
+
     private bool canPauseGame;
+    #endregion
 
+    #region - Events -
     public static event Action PauseStateChanged;
+    #endregion
 
-    public bool IsGamePaused { get; private set; }
+    #region - Properties -
+    public bool IsGamePaused { get; private set; } 
+    #endregion
 
     #region - "Singleton" Instance -
     private static GameManager instance;
@@ -45,6 +51,7 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+    #region - Public methods -
     /// <summary>
     /// Goes in and out of paused state, enabling and disabling required components. Raises the PauseStateChanged event if so specified.
     /// </summary>
@@ -71,7 +78,9 @@ public class GameManager : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
         }
     }
+    #endregion
 
+    #region - MonoBehavior methods -
     private void Awake()
     {
         InitializeSingleton();
@@ -106,10 +115,12 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region - Event handlers -
     private void OnSceneLoaded(Scene loadedScene, LoadSceneMode loadedSceneMode)
     {
-        if (loadedScene.name == Constants.MainMenuSceneName) 
+        if (loadedScene.name == Constants.MainMenuSceneName)
         {
             playerController.enabled = false;
             PlacementManager.Instance.enabled = false;
@@ -121,13 +132,13 @@ public class GameManager : MonoBehaviour
             // Level scene loaded
             if (!IsGamePaused)
             {
-                ChangePauseState(true, false); 
+                ChangePauseState(true, false);
             }
 
             canPauseGame = false;
         }
     }
-    
+
     private void OnLevelStarted(bool isLevelRestarted)
     {
         canPauseGame = !isLevelRestarted;
@@ -137,5 +148,6 @@ public class GameManager : MonoBehaviour
     {
         canPauseGame = false;
         ChangePauseState(true, false);
-    }
+    } 
+    #endregion
 }

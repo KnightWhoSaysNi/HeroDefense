@@ -8,6 +8,7 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
     where TPool : ScriptableObject 
     where TPoolObject : MonoBehaviour, IPoolable
 {
+    #region - Fields -
     /// <summary>
     /// All different prefabs for which object pools are created.
     /// </summary>
@@ -25,27 +26,24 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
     [Tooltip("Count of objects that will be instantiated with each expand.")]
     [Range(1, 100)]
     [SerializeField]
-    protected int expandCount;
-    
+    protected int expandCount;     
+
     /// <summary>
     /// Pools of available objects. Not yet used in a scene.
     /// </summary>
-    protected Dictionary<TPool, List<TPoolObject>> availablePools;
+    protected Dictionary<TPool, Queue<TPoolObject>> availablePools;
     /// <summary>
     /// Pools of unavailable objects. Objects used in a scene.
     /// </summary>
     protected Dictionary<TPool, HashSet<TPoolObject>> unavailablePools;
-
-    [Tooltip("Maximum amount of time (in seconds) that expansion of a pool can take. " +
-        "Used if instantiation is broken into multiple frames and/or expand count is too large for a single call.")]
-    [Range(0.02f, 0.5f)]
-    [SerializeField]
-    protected float maxTimeForExpansion;
-    protected bool isThresholdReached;
+    
+    protected bool isExpandNeeded;
     protected HashSet<TPool> poolsToExpand;
 
     protected Transform myTransform;
+    #endregion
 
+    #region - Public methods -
     /// <summary>
     /// Get an object from the specified pool with pre/post-activation data, and set its parent.
     /// </summary>
@@ -58,19 +56,28 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
     {
         int countOfAvailableObjects = availablePools[pool].Count;
 
-        // Expand if threshold reached or if the pool is empty
-        if (countOfAvailableObjects == expandThreshold || countOfAvailableObjects == 0)
+        if (countOfAvailableObjects == 0)
         {
+            // Since the pool is empty instantiate a new object on the fly - the object that will be returned
             InstantiateObject(pool);
-            countOfAvailableObjects = 1;
 
-            isThresholdReached = true;
+            // If the expand count is 1, the above code is all that is required - 1 new object is instantiated as it becomes needed
+            // Otherwise report that the pool needs to expand
+            if (expandCount > 1)
+            {
+                isExpandNeeded = true;
+                poolsToExpand.Add(pool);
+            }
+        }
+        else if (countOfAvailableObjects == expandThreshold)
+        {
+            // Currently there is an available object to return, but report that the pool needs to expand since threshold is reached
+            isExpandNeeded = true;
             poolsToExpand.Add(pool);
         }
 
-        // Get the last object in the available and move it to the unavailable pool
-        TPoolObject pooledObject = availablePools[pool][countOfAvailableObjects - 1];
-        availablePools[pool].RemoveAt(countOfAvailableObjects - 1);
+        // Get an object from the available and move it to the unavailable pool
+        TPoolObject pooledObject = availablePools[pool].Dequeue();
         unavailablePools[pool].Add(pooledObject);
 
         // Change parent and activate the object 
@@ -83,12 +90,14 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
     /// <summary>
     /// Get an object from the specified pool and set its parent.
     /// </summary>
+    /// <param name="pool">Pool to get an object from.</param>
+    /// <param name="parent">New parent of the pooled object.</param>
     public TPoolObject GetObject(TPool pool, Transform parent)
     {
         TPoolObject pooledObject = GetObject(pool, parent, null, null);
         return pooledObject;
     }
-        
+
     /// <summary>
     /// Return all used objects to their respective pools.
     /// </summary>
@@ -97,53 +106,75 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
         // Go through all pools
         foreach (var poolObjectPair in unavailablePools)
         {
-            // Go through all pool objects in the current pool and let the available pool claim them 
-            // without deleting them from the unavailable pool
-            foreach (var poolObject in poolObjectPair.Value)
-            {
-                ReclaimObject(poolObjectPair.Key, poolObject, false);
-            }
-
-            // Clear the current unavailable pool
-            poolObjectPair.Value.Clear();
+            ReclaimAllObjectFromPool(poolObjectPair.Key);
         }
     }
 
     /// <summary>
-    /// Return the specified object to the pool.
+    /// Return all used objects of the specified pool.
     /// </summary>
-    /// <param name="pool">Pool to which to return the object.</param>
-    public void ReclaimObject(TPool pool, TPoolObject objectToReclaim)
+    public void ReclaimAllObjectFromPool(TPool pool)
     {
-        ReclaimObject(pool, objectToReclaim, true);
+        // Go through all pool objects in the current pool and let the available pool claim them 
+        // without deleting them from the unavailable pool
+        foreach (var poolObject in unavailablePools[pool])
+        {
+            ReclaimObject(pool, poolObject, false);
+        }
+
+        // Clear the unavailable pool
+        unavailablePools[pool].Clear();
     }
 
+    /// <summary>
+    /// Destroy all game objects of the specified pool. Game objects are first returned to the available pool.
+    /// </summary>
+    public void ClearPool(TPool poolToClear)
+    {
+        ReclaimAllObjectFromPool(poolToClear);
+
+        while (availablePools[poolToClear].Count > 0)
+        {
+            TPoolObject poolObject = availablePools[poolToClear].Dequeue();
+            Destroy(poolObject);
+        }
+    }
+    #endregion
+
+    #region - Abstract methods -
+    public abstract void ReclaimObject(TPoolObject objectToReclaim);
+
+    protected abstract void SetAllPools();
+    protected abstract void InitializeDefaultActivePools();
+    #endregion
+
+    #region - MonoBehavior methods -
     protected virtual void Awake()
     {
         allPools = new Dictionary<TPool, TPoolObject>();
-        availablePools = new Dictionary<TPool, List<TPoolObject>>();
+        availablePools = new Dictionary<TPool, Queue<TPoolObject>>();
         unavailablePools = new Dictionary<TPool, HashSet<TPoolObject>>();
         poolsToExpand = new HashSet<TPool>();
 
-        myTransform = transform;      
+        myTransform = transform;
     }
 
     protected virtual void Start()
     {
         foreach (var item in allPools)
         {
-            availablePools.Add(item.Key, new List<TPoolObject>());
+            availablePools.Add(item.Key, new Queue<TPoolObject>());
             unavailablePools.Add(item.Key, new HashSet<TPoolObject>());
         }
 
         InitializeDefaultActivePools();
     }
-    
+
     protected virtual void Update()
-    {        
-        if (isThresholdReached)
+    {
+        if (isExpandNeeded)
         {
-            isThresholdReached = false;
+            isExpandNeeded = false;
             foreach (TPool pool in poolsToExpand)
             {
                 ExpandPool(pool, expandCount);
@@ -151,18 +182,16 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
             poolsToExpand.Clear();
         }
     }
+    #endregion
 
-    protected abstract void SetAllPools();
-    protected abstract void InitializeDefaultActivePools();
-    
-
+    #region - Protected methods -
     /// <summary>
     /// Instantiates an object for the specified pool and deactivates it.
     /// </summary>
     protected virtual void InstantiateObject(TPool pool)
     {
         TPoolObject instantiatedObject = Instantiate(allPools[pool], myTransform);
-        availablePools[pool].Add(instantiatedObject);
+        availablePools[pool].Enqueue(instantiatedObject);
 
         DeactivatePoolObject(instantiatedObject);
     }
@@ -189,20 +218,22 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
             unavailablePools[pool].Remove(objectToReclaim);
         }
 
-        availablePools[pool].Add(objectToReclaim);
+        availablePools[pool].Enqueue(objectToReclaim);
 
         DeactivatePoolObject(objectToReclaim);
         objectToReclaim.transform.SetParent(myTransform, false);
     }
+    #endregion
 
+    #region - Private methods -
     /// <summary>
     /// Calls the specified pool object's pre/post-activation methods before/after activating the game object it belongs to.
     /// </summary>
     private void ActivatePoolObject(TPoolObject objectToActivate, System.Object preActivationData, System.Object postActivationData)
     {
-        objectToActivate.PreActivation(preActivationData);
+        objectToActivate.DoPreActivation(preActivationData);
         objectToActivate.gameObject.SetActive(true);
-        objectToActivate.PostActivation(postActivationData);
+        objectToActivate.DoPostActivation(postActivationData);
     }
 
     /// <summary>
@@ -210,10 +241,9 @@ public abstract class PoolBase<TPool, TPoolObject> : MonoBehaviour
     /// </summary>
     private void DeactivatePoolObject(TPoolObject objectToDeactivate)
     {
-        objectToDeactivate.PreDeactivation();
+        objectToDeactivate.DoPreDeactivation();
         objectToDeactivate.gameObject.SetActive(false);
-        objectToDeactivate.PostDeactivation();
-    }
+        objectToDeactivate.DoPostDeactivation();
+    } 
+    #endregion
 }
-
-

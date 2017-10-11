@@ -43,6 +43,14 @@ public class EnemyPool : PoolBase<EnemyType, Enemy>
     }
     #endregion
 
+    /// <summary>
+    /// Return the specified enemy to its pool.
+    /// </summary>
+    public override void ReclaimObject(Enemy enemyToReclaim)
+    {
+        base.ReclaimObject(enemyToReclaim.EnemyType, enemyToReclaim, true);
+    }
+
     protected override void Awake()
     {
         InitializeSingleton();

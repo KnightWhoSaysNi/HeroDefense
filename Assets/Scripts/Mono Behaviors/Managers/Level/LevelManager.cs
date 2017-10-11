@@ -5,7 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour // TODO Create custom editor
 {
-    public List<SceneLevelPair> allLevels;
+    #region - Fields -
+    [SerializeField]
+    private List<SceneLevelPair> allLevels;
     private LevelData levelData;
 
     private string newlyLoadedSceneName;
@@ -13,7 +15,7 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
 
     // Level specific fields
     private Level currentLevel;
-    private int totalWaveCount;   
+    private int totalWaveCount;
     private int currentEnergy;
     private bool canStartLevel;
     private bool isLevelOngoing;
@@ -33,11 +35,15 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
     private bool hasEndDelay;
     private bool shouldEnemiesAppear;
     private bool hasDelayBeforeSpawning;
+    #endregion
 
+    #region - Events -
     public static event System.Action LevelRestarted;
     public static event System.Action PlayerWon;
     public static event System.Action PlayerLost;
+    #endregion
 
+    #region - Properties -
     public int CurrentEnergy
     {
         get
@@ -76,7 +82,8 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
 
             return totalWaveCount;
         }
-    }
+    } 
+    #endregion
 
     #region - "Singleton" Instance -
     private static LevelManager instance;
@@ -106,8 +113,9 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
             Destroy(this.gameObject);
         }
     }
-    #endregion    
+    #endregion
 
+    #region - Public methods -
     /// <summary>
     /// Sets up level data for the LevelManager.
     /// </summary>
@@ -141,7 +149,9 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
 
         LevelRestarted?.Invoke();
     }
-   
+    #endregion
+
+    #region - MonoBehavior methods -
     private void Awake()
     {
         InitializeSingleton();
@@ -157,10 +167,9 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
 
     private void Update()
     {
-        // TEST
         if (canStartLevel && Input.GetKeyDown(KeyCode.G))
         {
-            canStartLevel = false;            
+            canStartLevel = false;
             StopAllCoroutines();
             StartCoroutine(PlayLevel());
         }
@@ -177,33 +186,19 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
             PlayerWon?.Invoke();
         }
     }
+    #endregion
 
+    #region - Private methods -
+    #region - Event handlers -
     private void OnSceneLoaded(Scene loadedScene, LoadSceneMode loadedSceneMode)
     {
-        if (loadedScene.name != Constants.MainMenuSceneName && loadedScene.name != Constants.GameplayUISceneName) 
+        if (loadedScene.name != Constants.MainMenuSceneName && loadedScene.name != Constants.GameplayUISceneName)
         {
             newlyLoadedSceneName = loadedScene.name;
             isResetRequired = true;
 
             UpdateCurrentLevel(newlyLoadedSceneName);
         }
-    }
-
-    private void ResetLevel()
-    {
-        numberOfAliveEnemies = 0;
-        waveOrdinalNumber = 0;
-        totalWaveCount = 0;
-        isLevelOngoing = false;
-        haveAllWavesSpawned = false;
-
-        currentEnergy = currentLevel.startEnergy;
-        Player.Instance.Gold = currentLevel.startGold;
-                
-        UIManager.Instance.UpdateWaveInfo(0, TotalWaveCount);
-        UIManager.Instance.UpdateEnergyInfo(currentEnergy, currentLevel.startEnergy);
-
-        SetUpPlayerBearings();
     }
 
     /// <summary>
@@ -245,11 +240,53 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
     }
 
     /// <summary>
+    /// Reduces the number of alive enemies and reports to the player how much gold and experience he got if he killed the enemy.
+    /// Doesn't reward the player if the enemy has finished the level but reduces the current energy.
+    /// </summary>    
+    private void OnEnemyDied(Enemy enemy, Collider enemyCollider, bool hasFinishedLevel)
+    {
+        if (isLevelOngoing)
+        {
+            numberOfAliveEnemies--;
+
+            if (hasFinishedLevel)
+            {
+                CurrentEnergy -= enemy.EnergyDrain;
+            }
+            else
+            {
+                // Enemy was killed by the player
+                Player.Instance.Gold += enemy.GoldReward;
+                int experienceReward = (enemy.Level / Player.Instance.Level) * enemy.BaseExperienceReward;
+                Player.Instance.Experience += experienceReward;
+            }
+        }
+    }
+    #endregion
+
+    private void ResetLevel()
+    {
+        numberOfAliveEnemies = 0;
+        waveOrdinalNumber = 0;
+        totalWaveCount = 0;
+        isLevelOngoing = false;
+        haveAllWavesSpawned = false;
+
+        currentEnergy = currentLevel.startEnergy;
+        Player.Instance.Gold = currentLevel.startGold;
+
+        UIManager.Instance.UpdateWaveInfo(0, TotalWaveCount);
+        UIManager.Instance.UpdateEnergyInfo(currentEnergy, currentLevel.startEnergy);
+
+        SetUpPlayerBearings();
+    }
+
+    /// <summary>
     /// Sets up player position and rotation for the newly loaded level.
     /// </summary>
     private void SetUpPlayerBearings()
     {
-        Player.Instance.transform.position = levelData.playerStartBearings.position;        
+        Player.Instance.transform.position = levelData.playerStartBearings.position;
         Player.Instance.transform.rotation = levelData.playerStartBearings.rotation;
         GameManager.Instance.playerCamera.transform.localEulerAngles = Vector3.zero;
     }
@@ -268,7 +305,7 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
             // Set start delay if the wave has it
             hasStartDelay = currentWave.startDelay > 0;
             if (hasStartDelay)
-            {                
+            {
                 waveStartDelay = new WaitForSeconds(currentWave.startDelay);
             }
 
@@ -277,7 +314,7 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
             if (hasEndDelay)
             {
                 waveEndDelay = new WaitForSeconds(currentWave.endDelay);
-            }            
+            }
 
             // Repeat playing the wave waveCount times
             for (int j = 0; j < currentLevel.levelElements[i].waveCount; j++)
@@ -324,15 +361,15 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
         {
 
             currentWaveElement = currentWave.waveElements[i];
-            shouldEnemiesAppear = currentWaveElement.chanceOfAppearing >= Random.Range(0f, 1f); 
+            shouldEnemiesAppear = currentWaveElement.chanceOfAppearing >= Random.Range(0f, 1f);
 
             if (shouldEnemiesAppear)
             {
                 hasDelayBeforeSpawning = currentWaveElement.additionalSpawnDelay > 0;
                 if (hasDelayBeforeSpawning)
                 {
-                    additionalSpawnDelay = new WaitForSeconds(currentWaveElement.additionalSpawnDelay);                
-                }                
+                    additionalSpawnDelay = new WaitForSeconds(currentWaveElement.additionalSpawnDelay);
+                }
 
                 // Get the exact number of enemies for this wave element
                 numberOfEnemies = Random.Range(currentWaveElement.minNumberOfEnemies, currentWaveElement.maxNumberOfEnemies + 1);
@@ -358,32 +395,8 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
     /// </summary>
     private void SpawnEnemy(Enemy enemy)
     {
-        Enemy spawnedEnemy = EnemyPool.Instance.GetObject(enemy.EnemyType, levelData.enemyParent, null, levelData.endPoint.position);     
+        Enemy spawnedEnemy = EnemyPool.Instance.GetObject(enemy.EnemyType, levelData.enemyParent, null, levelData.endPoint.position);
         numberOfAliveEnemies++;
-    }
-
-    /// <summary>
-    /// Reduces the number of alive enemies and reports to the player how much gold and experience he got if he killed the enemy.
-    /// Doesn't reward the player if the enemy has finished the level but reduces the current energy.
-    /// </summary>    
-    private void OnEnemyDied(Enemy enemy, Collider enemyCollider, bool hasFinishedLevel)
-    {
-        if (isLevelOngoing)
-        {
-            numberOfAliveEnemies--;
-
-            if (hasFinishedLevel)
-            {
-                CurrentEnergy -= enemy.EnergyDrain;
-            }
-            else
-            {
-                // Enemy was killed by the player
-                Player.Instance.Gold += enemy.GoldReward;
-                int experienceReward = (enemy.Level / Player.Instance.Level) * enemy.BaseExperienceReward;
-                Player.Instance.Experience += experienceReward;
-            }
-        }
     }
 
     /// <summary>
@@ -391,8 +404,9 @@ public class LevelManager : MonoBehaviour // TODO Create custom editor
     /// </summary>
     private bool IsWaveFinished()
     {
-        return numberOfAliveEnemies == 0; 
-    }
+        return numberOfAliveEnemies == 0;
+    } 
+    #endregion
 }
 
 [System.Serializable]

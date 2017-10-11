@@ -7,10 +7,11 @@ using UnityEngine.UI;
 
 public class UIManager : Raycaster
 {
+    #region - Fields -
     public Sprite emptySlotSprite;
     private GameplayUIData gameplayUIData;
     private MainMenuUIData mainMenuUIData;
-    
+
     /// <summary>
     /// Amount of seconds to keep the message visible
     /// </summary>
@@ -32,9 +33,13 @@ public class UIManager : Raycaster
     private Enemy activeEnemy;
     private Placeable activePlaceable;
     private Player player;
+    #endregion
 
+    #region - Events -
     public static event Action LevelStarted;
+    #endregion
 
+    #region - Properties -
     /// <summary>
     /// Returns true only if gameplayUIData has been received and UIManager can manipulate UI elements of the GameplayUI scene.
     /// </summary>
@@ -64,7 +69,8 @@ public class UIManager : Raycaster
                 activePlaceable = value;
             }
         }
-    }
+    } 
+    #endregion
 
     #region - "Singleton" Instance -
     private static UIManager instance;
@@ -97,7 +103,7 @@ public class UIManager : Raycaster
 
     #endregion
 
-
+    #region - UI setup -
     /// <summary>
     /// Sets up main menu UI controls for the UIManager.
     /// </summary>
@@ -119,7 +125,8 @@ public class UIManager : Raycaster
 
         ResetGameplayUI();
         SetUpGameplayMenuHandlers();
-    }
+    } 
+    #endregion
 
     #region - Main Menu UI -
 
@@ -474,6 +481,7 @@ public class UIManager : Raycaster
 
     #endregion
 
+    #region - MonoBehavior methods -
     protected new void Awake()
     {
         InitializeSingleton();
@@ -491,6 +499,7 @@ public class UIManager : Raycaster
         PlacementManager.PlacementModeChanged += OnPlacementModeChanged;
         LevelManager.PlayerWon += () => OnGameEnd(true);
         LevelManager.PlayerLost += () => OnGameEnd(false);
+
         Player.LevelGained += UpdatePlayerLevel;
         Player.ExperienceGained += UpdatePlayerExperience;
         Player.GoldGained += UpdatePlayerGold;
@@ -519,7 +528,9 @@ public class UIManager : Raycaster
         CheckForCountdownMessage();
         CheckForKeepMessageAlive();
     }
+    #endregion
 
+    #region - Methods used in Update (directly and indirectly)
     /// <summary>
     /// Checks for gameplay pause/unpause and shows/hides the pause menu accordingly.
     /// </summary>
@@ -530,7 +541,7 @@ public class UIManager : Raycaster
             isPauseToggled = false;
             PauseMenuSetActive(GameManager.Instance.IsGamePaused);
         }
-    }    
+    }
 
     /// <summary>
     /// Raycasts from the camera through the center of the viewport and if enemy or placeable were hit displays their information.
@@ -542,7 +553,7 @@ public class UIManager : Raycaster
         // A LOT of "else if" checks are used so that no unnecessary canvas activation/deactivation happens with each frame
         if (Physics.Raycast(cameraRay, out raycastHit, 25, raycastHitLayerMask)) // ADD TO CONST max distance
         {
-            if (raycastHit.transform.CompareTag(Constants.EnemyTag)) 
+            if (raycastHit.transform.CompareTag(Constants.EnemyTag))
             {
                 // Enemy is hit
                 ActivePlaceable = null;
@@ -594,7 +605,7 @@ public class UIManager : Raycaster
     /// Finds and updates active enemy from the raycastHit object tagged as Enemy.
     /// </summary>
     private void UpdateActiveEnemy()
-    {        
+    {
         if (activeEnemy == null)
         {
             // There was no active enemy previously so enemy health canvas is activating now
@@ -629,7 +640,7 @@ public class UIManager : Raycaster
             gameplayUIData.placeableCanvas.SetActive(true);
         }
 
-        ActivePlaceable = raycastHit.transform.GetComponent<Placeable>();        
+        ActivePlaceable = raycastHit.transform.GetComponent<Placeable>();
     }
 
     /// <summary>
@@ -639,7 +650,7 @@ public class UIManager : Raycaster
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            PlacementManager.Instance.SellPlaceable(activePlaceable);            
+            PlacementManager.Instance.SellPlaceable(activePlaceable);
 
             gameplayUIData.placeableCanvas.SetActive(false);
             ActivePlaceable = null;
@@ -691,10 +702,12 @@ public class UIManager : Raycaster
             }
         }
     }
+    #endregion
 
+    #region - Event handlers (for non player events) -
     private void OnSceneLoaded(Scene loadedScene, LoadSceneMode loadSceneMode)
     {
-        if (loadedScene.name == Constants.MainMenuSceneName) 
+        if (loadedScene.name == Constants.MainMenuSceneName)
         {
             // GameplayUIData holds only nulls, because GameplayUI scene was removed. 
             // IsReadyToReceiveUpdates property needs to return false and that is assured by setting gameplayUIData to null
@@ -750,7 +763,8 @@ public class UIManager : Raycaster
         {
             gameplayUIData.levelEndGoToNextLevel.interactable = false;
         }
-    }
+    } 
+    #endregion
 }
 
 [System.Serializable]

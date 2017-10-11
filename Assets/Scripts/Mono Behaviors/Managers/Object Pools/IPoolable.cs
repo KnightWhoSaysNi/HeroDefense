@@ -5,8 +5,8 @@ using UnityEngine;
 
 public interface IPoolable
 {
-    void PreActivation(System.Object data);
-    void PostActivation(System.Object data);
-    void PreDeactivation();
-    void PostDeactivation();
+    void DoPreActivation(System.Object data);
+    void DoPostActivation(System.Object data);
+    void DoPreDeactivation();
+    void DoPostDeactivation();
 }

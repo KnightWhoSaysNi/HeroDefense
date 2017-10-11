@@ -4,10 +4,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
-{
-    public CanvasGroup fadeCanvasGroup;
-    public float fadeSpeed = 2f;
-
+{    
+    [SerializeField] private CanvasGroup fadeCanvasGroup;
+    [SerializeField] private float fadeSpeed = 2f;
     private bool isGameplayUILoaded;
 
     public event System.Action MainMenuLoading;
