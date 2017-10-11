@@ -177,7 +177,7 @@ public abstract class Placeable : MonoBehaviour, IPoolable // TODO Write custom 
     }
 
     protected virtual void OnDisable()
-    {        
+    {
         IsPlaced = false;
         isInIllegalState = false;
         numberOfCollidedPlaceables = 0;

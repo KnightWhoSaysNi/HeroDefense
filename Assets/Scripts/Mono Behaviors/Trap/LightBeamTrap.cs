@@ -29,6 +29,12 @@ public class LightBeamTrap : Trap
         }
     }
 
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        beam.enabled = false;
+    }
+
     protected override void OnObstructionChanged()
     {
         base.OnObstructionChanged();

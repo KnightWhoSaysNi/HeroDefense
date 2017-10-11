@@ -94,10 +94,10 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
     protected override void OnDisable()
     {
         base.OnDisable();
+        state = TrapState.NormalState;
         enemiesInRange.Clear();
         hasWaitedForAttackHitDelay = false;
-        isWaitingForCooldown = false;
-        IsObstructed = true;
+        isWaitingForCooldown = false;        
         currentEnemy = null;
     }
     #endregion    
@@ -522,7 +522,7 @@ public class Trap : Placeable // TODO make this class an abstract class and crea
                 // By default single attack trap uses a trigger and nothing more is added here
                 break;
             case AttackMode.ContinuousAttack:
-                animator.SetBool(Constants.TrapAnimatorIsAttackingBool, false); 
+                animator.SetBool(Constants.TrapAnimatorIsAttackingBool, false);                 
                 break;
             default:
                 throw new UnityException("Trap.GoToAttackState has code for only two attack states.");
