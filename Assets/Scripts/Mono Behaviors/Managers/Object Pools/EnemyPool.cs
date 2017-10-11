@@ -10,8 +10,10 @@ public class EnemyPool : PoolBase<EnemyType, Enemy>
     [SerializeField]
     private int enemyStartCount;
     [Space(10)]
+    [Tooltip("Enemy objects for which you wish to make a pool.")]
     [SerializeField]
-    private List<EnemyPoolPair> enemyPools;
+    private Enemy[] enemyPools;
+    private HashSet<Enemy> enemyPoolsSet;
 
     #region - "Singleton" Instance -
     private static EnemyPool instance;
@@ -55,31 +57,44 @@ public class EnemyPool : PoolBase<EnemyType, Enemy>
     {
         InitializeSingleton();
 
+        enemyPoolsSet = new HashSet<Enemy>();
+        PopulateSet();
+
         base.Awake();
         SetAllPools();
     }
 
     protected override void SetAllPools()
     {
-        for (int i = 0; i < enemyPools.Count; i++)
+        foreach (Enemy enemy in enemyPoolsSet)
         {
-            allPools.Add(enemyPools[i].pool, enemyPools[i].poolObject);
+            allPools.Add(enemy.EnemyType, enemy);
         }
     }
 
     protected override void InitializeDefaultActivePools()
     {
         // Go through each pool and instantiate a number of objects for it
-        for (int i = 0; i < enemyPools.Count; i++)
+        foreach (Enemy enemy in enemyPoolsSet)
         {
-            ExpandPool(enemyPools[i].pool, enemyStartCount);
+            ExpandPool(enemy.EnemyType, enemyStartCount);
         }
-    }    
-}
+    }
 
-[System.Serializable]
-public struct EnemyPoolPair
-{
-    public EnemyType pool;
-    public Enemy poolObject;
+    /// <summary>
+    /// Populates a hash set of enemies to make sure there are no duplicates given in the inspector.
+    /// </summary>
+    private void PopulateSet()
+    {
+        bool isAdded;
+        for (int i = 0; i < enemyPools.Length; i++)
+        {
+            isAdded = enemyPoolsSet.Add(enemyPools[i]);
+
+            if (!isAdded)
+            {
+                throw new UnityException($"Enemy pool has a duplicate enemy. A pool for {enemyPools[i].EnemyType} already exists. Check the inspector.");
+            }
+        }
+    }
 }
